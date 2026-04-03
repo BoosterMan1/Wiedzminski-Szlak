@@ -215,23 +215,23 @@ const shopItems = [
 
 const monsterTemplates = {
     // POZIOM 1-3: Rozgrzewka (HP: 150 - 800)
-    'utopiec': { name: 'Utopiec', hp: 200, atk: 20, arm: 5, reward: 80, style: 'normal', baseSpeed: 1.0, img: 'images/utopiec.webp' },
+    'utopiec': { name: 'Utopiec', hp: 200, atk: 20, arm: 5, reward: 80, style: 'normal', baseSpeed: 1.0, img: 'utopiec.webp' },
     'ghul': { name: 'Ghul Alghul', hp: 450, atk: 35, arm: 15, reward: 160, style: 'charge', baseSpeed: 1.3, img: 'ghul.webp' },
     'poludnica': { name: 'Południca', hp: 900, atk: 55, arm: 35, reward: 350, style: 'mirage', baseSpeed: 1.5, img: 'polodnica.webp' },
 
     // POZIOM 4-6: Poważne zlecenia (HP: 2 000 - 8 000)
-    'gryf': { name: 'Gryf Królewski', hp: 2500, atk: 110, arm: 80, reward: 1200, style: 'charge', baseSpeed: 1.9, img: 'images/gryf.webp' },
-    'wilkolak': { name: 'Wilkołak', hp: 5000, atk: 180, arm: 150, reward: 2800, style: 'blink', baseSpeed: 2.3, img: 'images/wilkolak.webp' },
-    'leszy': { name: 'Starożytny Leszy', hp: 9500, atk: 280, arm: 250, reward: 5500, style: 'mirage', baseSpeed: 2.6, img: 'images/leszy.webp' },
+    'gryf': { name: 'Gryf Królewski', hp: 2500, atk: 110, arm: 80, reward: 1200, style: 'charge', baseSpeed: 1.9, img: 'gryf.webp' },
+    'wilkolak': { name: 'Wilkołak', hp: 5000, atk: 180, arm: 150, reward: 2800, style: 'blink', baseSpeed: 2.3, img: 'wilkolak.webp' },
+    'leszy': { name: 'Starożytny Leszy', hp: 9500, atk: 280, arm: 250, reward: 5500, style: 'mirage', baseSpeed: 2.6, img: 'leszy.webp' },
 
     // POZIOM 7-9: Koszmary (HP: 20 000 - 80 000)
-    'bies': { name: 'Bies', hp: 22000, atk: 450, arm: 600, reward: 14000, style: 'blink', baseSpeed: 3.0, img: 'images/bies.webp' },
-    'stara_przadka': { name: 'Prządka', hp: 45000, atk: 850, arm: 1200, reward: 35000, style: 'orbit', baseSpeed: 3.4, img: 'images/przadka.webp' },
-    'detlaff': { name: 'Dettlaff van der Eretein', hp: 90000, atk: 1500, arm: 2500, reward: 85000, style: 'blink', baseSpeed: 4.0, img: 'images/detlaff.webp' },
+    'bies': { name: 'Bies', hp: 22000, atk: 450, arm: 600, reward: 14000, style: 'blink', baseSpeed: 3.0, img: 'bies.webp' },
+    'stara_przadka': { name: 'Prządka', hp: 45000, atk: 850, arm: 1200, reward: 35000, style: 'orbit', baseSpeed: 3.4, img: 'przadka.webp' },
+    'detlaff': { name: 'Dettlaff van der Eretein', hp: 90000, atk: 1500, arm: 2500, reward: 85000, style: 'blink', baseSpeed: 4.0, img: 'detlaff.webp' },
 
     // POZIOM 10: Finał (HP: 250 000+)
-    'ukryty': { name: 'Ukryty Wyższy Wampir', hp: 250000, atk: 3500, arm: 6000, reward: 180000, style: 'blink', baseSpeed: 4.8, img: 'images/ukryty.webp' },
-    'pan_lusterko': { name: 'Gaunter o\'Dim', hp: 750000, atk: 8000, arm: 15000, reward: 500000, style: 'gaunter', baseSpeed: 5.5, img: 'images/gaunter.webp' }
+    'ukryty': { name: 'Ukryty Wyższy Wampir', hp: 250000, atk: 3500, arm: 6000, reward: 180000, style: 'blink', baseSpeed: 4.8, img: 'ukryty.webp' },
+    'pan_lusterko': { name: 'Gaunter o\'Dim', hp: 750000, atk: 8000, arm: 15000, reward: 500000, style: 'gaunter', baseSpeed: 5.5, img: 'gaunter.webp' }
 };
 
 
@@ -1634,7 +1634,7 @@ function startTraining(styleKey, monsterName = null) {
         reward: 0,
         style: styleKey,
         baseSpeed: simulatedDifficulty,
-        img: "images/kukla.png", // Domyślny obrazek kukły (można podmienić w startMonsterSimulation)
+        img: "kukla.png", // Domyślny obrazek kukły (można podmienić w startMonsterSimulation)
         key: 'training_dummy' // Klucz do rozpoznawania trybu treningu w innych funkcjach
     };
 
