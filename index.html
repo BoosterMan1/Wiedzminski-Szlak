@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="pl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wiedźmiński Szlak</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div id="sideMenuContainer" class="side-panel"></div>
+    <div id="blood-overlay" class="blood-vignette"></div>
+
+    <!-- Powiadomienia (dodaj tuż pod otwarciem body) -->
+    <div id="notification-area" style="position: fixed; top: 20px; right: 20px; z-index: 9999;"></div>
+
+    <div class="game-container" id="mainContainer">
+        <!-- Pasek statystyk -->
+        <div class="top-bar">
+            <span>💰 <span id="goldDisp">300</span></span>
+            <span>⚔️ <span id="atkDisp">15</span></span>
+            <span>🛡️ <span id="armDisp">0</span></span>
+            <span>👟 <span id="agiDisp">10</span></span>
+        </div>
+
+        <!-- Menu Główne -->
+        <div id="menu" class="screen">
+            <h2>Wiedźmiński Szlak</h2>
+            <div class="menu-location">Novigrad, rok 1272</div>
+
+            <button class="menu-btn btn-hunt" onclick="switchTab('hunt')">
+                ⚔️ Przyjmij Zlecenie
+            </button>
+
+            <button class="menu-btn btn-shop" onclick="switchTab('shop')">
+                💰 Bazar w Novigradzie
+            </button>
+
+            <button class="menu-btn" onclick="switchTab('char')" style="border-left: 4px solid #373aa4 !important;">
+                👤 Ekwipunek
+            </button>
+
+            <button class="menu-btn" onclick="switchTab('training')" style="border-left: 4px solid #568cbb !important;">
+                🎯 Plac Treningowy
+            </button>
+
+            <button class="menu-btn" onclick="switchTab('tutorial')" style="border-left: 4px solid #ead6a1 !important;">
+                📜 Jak grać?
+            </button>
+
+
+            <button class="btn-reset" onclick="confirmReset()">
+                ⚙️ PORZUĆ SZLAK I ZRESETUJ POSTĘP
+            </button>
+        </div>
+        <div id="tutorial" class="screen" style="display:none;">
+            <div class="witcher-letter">
+                <h3>📜 Wiedźmiński Kodeks Przetrwania</h3>
+                <p class="letter-intro">Słuchaj uważnie, wiedźminie. Szlak stał się brutalniejszy, a potwory
+                    sprytniejsze. Jeśli chcesz dożyć kolejnego świtu, zapamiętaj te zasady:</p>
+
+                <div class="letter-section">
+                    <h4>⚔️ Taniec Miecza i Balans Stali</h4>
+                    <p>Pamiętaj: <i>pancerz to nie wszystko</i>. Dzięki technice wiedźmińskiej zawsze zadajesz minimum
+                        <b>10% swoich obrażeń</b>, nawet najtwardszej bestii. Gdy zobaczysz przycisk <b>UNIK</b>, musisz
+                        reagować. Im wyższa <b>Zwinność</b>, tym wolniej płynie czas, dając Ci cenne milisekundy na
+                        reakcję.
+                    </p>
+                </div>
+
+                <div class="letter-section">
+                    <h4>✨ Znaki i Przygotowanie</h4>
+                    <p>Wybierz <b>3 aktywne Znaki</b> w Ekwipunku. Każdy z nich możesz użyć <b>raz na walkę</b> (energia
+                        odnawia się po starciu):</p>
+                    <ul style="font-size: 0.85rem; list-style-type: none; padding-left: 10px;">
+                        <li>🔥 <b>Igni:</b> Fala ognia i efekt <b>Płonącego Ostrza</b> (+75% DMG do kolejnych ciosów).
+                        </li>
+                        <li>🛡️ <b>Quen:</b> Tarcza, która leczy <b>15% HP</b> i ma szansę odbić atak wroga.</li>
+                        <li>🔮 <b>Yrden:</b> Pułapka ekstremalnie spowalniająca ruchy bestii na kilka tur.</li>
+                        <li>🌀 <b>Axii:</b> Oszałamia wroga, dając dużą szansę, że potwór spudłuje swój atak.</li>
+                        <li>💨 <b>Aard:</b> Fala uderzeniowa, która <b>rozbija pancerz wroga o 30%</b> na stałe.</li>
+                    </ul>
+                </div>
+
+                <div class="letter-section">
+                    <h4>🎒 Pas i Juki</h4>
+                    <p><b style="color:var(--accent)">WAŻNE:</b> Przedmioty musisz <b>ZAŁOŻYĆ</b>, aby działały. Śmierć
+                        oznacza utratę 30% złota i <b>losowego elementu ekwipunku</b>! W trakcie walki korzystaj z
+                        <b>Pasa</b> w panelu bocznym – znajdziesz tam mikstury i petardy. Uważaj: użycie przedmiotu lub
+                        znaku <b>kończy Twoją turę</b> (chyba że opis mówi inaczej).
+                    </p>
+                </div>
+
+                <div class="letter-section">
+                    <h4>🐺 Szał Bestii</h4>
+                    <p>Gdy życie potwora spadnie poniżej <b>30%</b>, wpadnie on w <b>morderczy szał</b>. Jego pasek HP
+                        zacznie pulsować, a ataki staną się o <b>25% szybsze</b>.
+                </div>
+
+                <div class="letter-section">
+                    <h4>🛒 Bazar i Trening</h4>
+                    <p>Sklep w Novigradzie zawiera przedmioty potrzebne ci do pokonywania kolejnych przeciwników,
+                        korzystaj z nich i inwestuj mądrze. Na placu treningowym możesz
+                        <b>symulować walkę z konkretną bestią</b>, którą już odblokowałś na szlaku, aby poznać jej styl
+                        bez ryzyka zgonu.
+                    </p>
+                </div>
+
+                <p class="letter-intro" style="text-align: center; margin-top: 20px;"><i>Niech Twój miecz zawsze trafia
+                        w punkt, a medalion ostrzega przed tym, czego nie widać.</i></p>
+
+                <button onclick="switchTab('menu')" class="menu-btn" style="margin-top:20px;">ZROZUMIAŁEM</button>
+            </div>
+        </div>
+
+
+
+
+
+        <!-- Sklep / Bazar -->
+        <div id="shop" class="screen" style="display:none;">
+            <h3 style="color:var(--gold)">🛒 Bazar w Novigradzie</h3>
+            <div class="shop-filters" style="display: flex; gap: 5px; margin-bottom: 10px;">
+                <button onclick="renderShop('all')" style="flex:1; font-size:0.7rem;">Wszystko</button>
+                <button onclick="renderShop('weapon')" style="flex:1; font-size:0.7rem;">Broń</button>
+                <button onclick="renderShop('armor')" style="flex:1; font-size:0.7rem;">Pancerz</button>
+                <button onclick="renderShop('consumable')" style="flex:1; font-size:0.7rem;">Użytkowe</button>
+                <button onclick="renderShop('trinket')" style="flex:1; font-size:0.7rem;">Inne</button>
+            </div>
+            <div id="shop-list"></div>
+            <button onclick="switchTab('menu')" style="width:100%; margin-top:10px;">Wróć do Menu</button>
+        </div>
+
+        <!-- Ekwipunek -->
+        <div id="char" class="screen" style="display:none;">
+
+            <h3 style="color:var(--armor)">👤 Przygotowanie Wiedźmina</h3>
+
+            <!-- Aktywne Sloty -->
+            <div class="slots-container"
+                style="display: flex; gap: 10px; justify-content: center; margin-bottom: 20px;">
+                <div class="slot" id="slot-weapon" onclick="unequip('weapon')">⚔️ Brak broni</div>
+                <div class="slot" id="slot-armor" onclick="unequip('armor')">🛡️ Brak zbroi</div>
+                <div class="slot" id="slot-trinket" onclick="unequip('trinket')">💍 Brak talizmanu</div>
+            </div>
+            <div class="sign-selector"
+                style="margin-bottom: 20px; background: #222; padding: 10px; border-radius: 8px;">
+                <p style="font-size: 0.7rem; color: #888; margin-bottom: 10px;">WYBIERZ 3 AKTYWNE ZNAKI:</p>
+                <div id="sign-selection-list" style="display: flex; gap: 10px; justify-content: center;">
+                    <!-- Generowane przez JS -->
+                </div>
+            </div>
+
+
+            <div id="inv-list"></div>
+            <button onclick="switchTab('menu')" style="width:100%; margin-top:20px;">Wróć</button>
+        </div>
+
+        <!-- Polowanie -->
+        <div id="hunt" class="screen" style="display:none;">
+            <h3 style="color:var(--accent)">📜 Tablica Ogłoszeń</h3>
+            <div id="monster-board" class="monster-grid">
+                <!-- Karty potworów zostaną wygenerowane przez JS -->
+            </div>
+            <button onclick="switchTab('menu')" style="width:100%; margin-top:20px;">Anuluj</button>
+        </div>
+
+        <!-- Ekran Śmierci -->
+        <div id="death-screen" class="screen"
+            style="display:none; background:rgba(0,0,0,0.9); z-index:2000; position:absolute; top:0; left:0; width:100%; height:100%; flex-direction:column; justify-content:center; align-items:center;">
+            <h1 style="color:red; font-size:3rem; margin:0;">POLEGŁEŚ</h1>
+            <p style="font-style:italic; color:#888;">Twoja historia mogła się tu skończyć...</p>
+
+            <div id="death-report"
+                style="background:#222; padding:20px; border:1px solid red; margin:20px; width:80%; font-size:0.9rem;">
+                <!-- Tu JS wpisze straty -->
+            </div>
+
+            <button onclick="respawn()" style="background:var(--accent); padding:15px 40px;">WSTAŃ I WALCZ
+                DALEJ</button>
+        </div>
+
+        <!-- Ekran Walki -->
+        <div id="game" class="screen" style="display:none; padding:0; position: relative; min-height: 500px;">
+
+            <!-- Przycisk wyjścia (X) - do ucieczki lub wyjścia z treningu -->
+            <button id="exitBattleBtn" class="btn-exit-battle" onclick="finishBattle()">✕</button>
+
+            <!-- Dedykowany, nietykalny panel walki -->
+            <div id="battleSidePanel" class="side-panel">
+                <div id="battleInvContainer" class="panel-content"></div>
+                <div id="battleSignsContainer" class="panel-content"></div>
+            </div>
+
+
+            <!-- Dynamiczny Przycisk Uniku -->
+            <button id="dodgeBtn" onmousedown="doDodge()"></button>
+
+
+
+            <div class="visual-area">
+                <img id="mImg" src="" alt="Potwór">
+            </div>
+
+            <div style="padding:15px;">
+                <!-- Pasek HP Potwora -->
+                <div class="hp-container">
+                    <div id="mHpBar" class="hp-bar-fill" style="width:100%;"></div>
+                </div>
+                <div class="hp-label"><span id="mName">POTWÓR</span> | HP: <span id="mHpVal">100</span></div>
+
+                <!-- PASEK HP GERALTA -->
+                <div class="hp-container" style="border-color: #2e5a2e; margin-top: 10px;">
+                    <div id="pHpBar" class="hp-bar-fill"
+                        style="width:100%; background: linear-gradient(90deg, #2e5a2e, #00ff00);"></div>
+                </div>
+                <div class="hp-label">TWOJE ZDROWIE: <span id="pHpVal">100</span> / <span id="pMaxHpVal">100</span>
+                </div>
+
+                <div id="log" class="log"></div>
+
+                <!-- Główne przyciski akcji -->
+                <div class="controls" id="battleActions">
+                    <button onclick="handleAction('attack')" class="btn-main-attack">⚔️ Szybki Atak</button>
+                    <button onclick="openWitcherPanel('inv')" style="background:#444;">🎒 Przedmioty</button>
+                    <button onclick="openWitcherPanel('signs')" style="background:#2e4a62;">✨ Znaki</button>
+                </div>
+
+                <!-- PRZYWRÓCONY PRZYCISK NAGRODY -->
+                <button onclick="finishBattle()" id="finishBtn"
+                    style="display:none; width:100%; background:#2e5a2e; margin-top:10px; border: 1px solid #4ed14e; color: white; padding: 15px; font-weight: bold; cursor: pointer;">
+                    💰 ODBIERZ NAGRODĘ I WRÓĆ
+                </button>
+            </div>
+        </div>
+
+
+        <!-- Własne okno dialogowe (Modal) -->
+        <div id="custom-modal" class="modal-overlay" style="display:none;">
+            <div class="modal-content">
+                <h3 id="modal-title">POTWIERDZENIE</h3>
+                <p id="modal-text">Czy na pewno chcesz to zrobić?</p>
+                <div class="modal-buttons">
+                    <button id="modal-confirm-btn" class="btn-danger">TAK</button>
+                    <button id="modal-cancel-btn" class="btn-secondary">ANULUJ</button>
+                </div>
+            </div>
+        </div>
+
+    </div> <!-- KONIEC game-container -->
+
+    <!-- Menu Treningu -->
+    <div id="training" class="screen" style="display:none;">
+        <h3 style="color:var(--gold)">⚔️ Plac Treningowy Kaer Morhen</h3>
+
+        <!-- PODSEKCJA 1: KLASYCZNA KUKŁA -->
+        <div id="training-classic">
+            <p style="font-size:0.8rem; color:#888; margin-bottom: 20px;">Ręczne ustawianie parametrów kukły
+                treningowej.</p>
+
+            <div class="training-slider-container">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <label style="color: #aaa; font-size: 0.75rem; text-transform: uppercase;">Poziom Trudności</label>
+                    <span id="agiValue">1.0</span>
+                </div>
+                <input type="range" id="agiSlider" min="0.5" max="8.0" value="1.0" step="0.1"
+                    oninput="document.getElementById('agiValue').innerText = parseFloat(this.value).toFixed(1) + 'x'">
+            </div>
+
+            <div id="training-list" class="monster-grid">
+                <div class="monster-card" onclick="startTraining('normal')"><b>Klasyczny atak</b></div>
+                <div class="monster-card" onclick="startTraining('charge')"><b>Szarża</b></div>
+                <div class="monster-card" onclick="startTraining('mirage')"><b>Iluzja</b></div>
+                <div class="monster-card" onclick="startTraining('combo')"><b>Grad ciosów</b></div>
+                <div class="monster-card" onclick="startTraining('orbit')"><b>Spirala</b></div>
+                <div class="monster-card" onclick="startTraining('blink')"><b>Teleportacja</b></div>
+            </div>
+
+            <button onclick="toggleTrainingMode('monsters')" class="menu-btn"
+                style="margin-top:20px; border-left: 4px solid var(--gold) !important;">
+                🐺 Ćwicz na stworach
+            </button>
+        </div>
+
+        <!-- PODSEKCJA 2: SYMULACJA POTWORÓW -->
+        <div id="training-monsters" style="display:none;">
+            <p style="font-size:0.8rem; color:#888; margin-bottom: 20px;">Symulacja walki z konkretną bestią (statystyki
+                automatyczne).</p>
+
+            <div id="training-monster-list" class="monster-grid" style="max-height: 400px; overflow-y: auto;">
+                <!-- Generowane przez JS -->
+            </div>
+
+            <button onclick="toggleTrainingMode('classic')" class="menu-btn"
+                style="margin-top:20px; border-left: 4px solid #444 !important;">
+                ⬅️ Powrót do ćwiczenia na kukiełce
+            </button>
+        </div>
+
+        <button onclick="switchTab('menu')"
+            style="width:100%; margin-top:20px; background: none; border: 1px solid #333;">Wróć do zamku</button>
+    </div>
+
+
+
+    <div id="item-tooltip"
+        style="display: none; position: fixed; pointer-events: none; z-index: 100000; background: rgba(0,0,0,0.9); border: 1px solid #daa520; color: white; padding: 10px; border-radius: 4px; font-size: 0.8rem; box-shadow: 0 0 20px #000;">
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
+
+
+<!-- Pomysły:
+ -->
