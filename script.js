@@ -221,7 +221,7 @@ const monsterTemplates = {
 
     // POZIOM 4-6: Poważne zlecenia (HP: 2 000 - 8 000)
     'gryf': { name: 'Gryf Królewski', hp: 2500, atk: 110, arm: 80, reward: 1200, style: 'charge', baseSpeed: 1.9, img: 'gryf.webp' },
-    'wilkolak': { name: 'Wilkołak', hp: 5000, atk: 180, arm: 150, reward: 2800, style: 'blink', baseSpeed: 2.3, img: 'wilkolak.webp' },
+    'wilkolak': { name: 'Wilkołak', hp: 5000, atk: 180, arm: 150, reward: 2800, style: 'combo', baseSpeed: 2.3, img: 'wilkolak.webp' },
     'leszy': { name: 'Starożytny Leszy', hp: 9500, atk: 280, arm: 250, reward: 5500, style: 'mirage', baseSpeed: 2.6, img: 'leszy.webp' },
 
     // POZIOM 7-9: Koszmary (HP: 20 000 - 80 000)
