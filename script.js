@@ -185,7 +185,7 @@ const shopItems = [
     { id: 45, name: "Tesham Mutna", price: 1200000, arm: 60000, type: 'armor', rarity: 'legendary', desc: "Szczyt wytrzymałości." },
 
     // --- UŻYTKOWE ---
-    { id: 13, name: "Jaskółka", price: 60, type: 'consumable', sub: 'pot', rarity: 'common', desc: "🧪 Podstawowa regeneracja." },
+    { id: 13, name: "Jaskółka", price: 60, type: 'consumable', sub: 'pot', rarity: 'common', desc: "🧪 Podstawowa regeneracja (+40% HP)." },
     { id: 15, name: "Samum", price: 200, type: 'consumable', sub: 'bomb', rarity: 'common', desc: "💣 Ogłuszająca petarda (150 DMG)." },
     { id: 14, name: "Puszczyk", price: 1500, type: 'consumable', sub: 'atk_perm', rarity: 'rare', desc: "📖 Wiedza o punktach witalnych (+5 Atak)." },
     { id: 17, name: "Grom", price: 1500, type: 'consumable', sub: 'arm_perm', rarity: 'rare', desc: "🧪 Alchemiczne wzmocnienie skóry (+5 Obrona)." },
