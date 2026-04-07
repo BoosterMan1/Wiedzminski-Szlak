@@ -762,8 +762,9 @@ function handleAction(type) {
         'potion': () => {
             if (stats.pot > 0 && stats.hp < stats.maxHp) {
                 stats.pot--;
-                stats.hp = Math.min(stats.maxHp, stats.hp + 50);
-                addLog("Wypito Jaskółkę! +50 HP", "#00ff00");
+                let healVal = stats.maxHp * 0.4;
+                stats.hp = Math.min(stats.maxHp, stats.hp + healVal);
+                addLog("Wypito Jaskółkę! + 40% HP", "#00ff00");
 
                 // PANCERNE ODŚWIEŻENIE: Przebudowujemy panel, aby pokazać nową ilość (np. 4 zamiast 5)
                 openWitcherPanel('inv');
@@ -1913,7 +1914,6 @@ function startMonsterSimulation(monsterKey) {
     // 4. LOGOWANIE SYSTEMOWE
     addLog(`SYMULACJA: ${m.name}. Styl bazowy: ${BATTLE_STYLES[m.style].name}`, "var(--gold)");
 }
-
 
 
 
