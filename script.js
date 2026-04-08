@@ -8,7 +8,8 @@ let equipped = { weapon: null, armor: null, trinket: null };
 let currentCombo = 0; // Dla stylu 'combo'
 let hitsNeeded = 1; // Ile razy trzeba kliknąć (dla stylu Combo)
 let isMirageActive = false; // Czy aktualnie trwa Miraż
-let signsUsed = { igni: false, quen: false, yrden: false, axii: false };
+let signsCooldown = { igni: 0, quen: 0, yrden: 0, axii: 0, aard: 0 };
+let signsMaxCooldown = { igni: 3, quen: 4, yrden: 5, axii: 4, aard: 5 };
 let dodgeIntervals = []; // Tablica na wszystkie aktywne interwały
 let currentTurnTimer;
 let selectedSigns = ['igni', 'quen', 'yrden']; // Domyślne 3 znaki
@@ -39,7 +40,13 @@ let stats = {
     bomb: 0,
     hp: 100,
     maxHp: 100,
-    maxUnlockedIndex: 0
+    maxUnlockedIndex: 0,
+    difficultyMult: 1.0,
+    difficultyName: 'Wyzwanie',
+    playerName: 'Geralt',
+    signUpgrades: { igni: 0, quen: 0, yrden: 0, axii: 0, aard: 0 },
+    signXp: { igni: 0, quen: 0, yrden: 0, axii: 0, aard: 0 },
+    tutorialsSeen: { hunt: false, shop: false, inventory: false, training: false }
 };
 
 
@@ -75,8 +82,13 @@ const BATTLE_STYLES = {
     'combo': {
         name: 'Grad ciosów',
         hits: 3,
-        static: true,
-        update: (f, pos) => pos
+        update: (f, pos, move, agi) => {
+            // Combo porusza się wolniej, ale wymaga 3 kliknięć
+            return {
+                x: pos.x + move.x * 0.5 * agi,
+                y: pos.y + move.y * 0.5 * agi
+            };
+        }
     },
     'orbit': {
         name: 'Spirala',
@@ -126,12 +138,12 @@ const BATTLE_STYLES = {
             pos.t = (pos.t || 0) + 0.05;
             const cycle = pos.t % 1.8;
             const isBlinking = cycle > 1.05; // Moment "mignięcia"
-            let speedMult = isBlinking ? (12 * agi) : (2 * agi);
+            let speedMult = isBlinking ? (6 * agi) : (2 * agi); // Zmniejszona prędkość mignięcia
 
             if (dBtn) {
-                dBtn.style.opacity = isBlinking ? "0.2" : "1";
+                dBtn.style.opacity = isBlinking ? "0.3" : "1"; // Bardziej widoczny
                 dBtn.style.pointerEvents = isBlinking ? "none" : "auto";
-                dBtn.style.filter = isBlinking ? "blur(4px)" : "none";
+                dBtn.style.filter = isBlinking ? "blur(2px)" : "none";
             }
 
             return {
@@ -194,6 +206,17 @@ const shopItems = [
     { id: 47, name: "Filtr Petriego", price: 12000, type: 'consumable', sub: 'sign_perm', rarity: 'epic', desc: "✨ Zwiększa moc znaków na stałe." },
     { id: 48, name: "Eliksir Oczyszczenia", price: 20000, type: 'consumable', sub: 'reset', rarity: 'epic', desc: "🌀 Pozwala zresetować statystyki." },
 
+    // --- ZIOŁA ---
+    { id: 101, name: "Jaskółcze Ziele", price: 10, type: 'consumable', sub: 'herb', rarity: 'common', desc: "Podstawowe zioło lecznicze." },
+    { id: 102, name: "Szczawik", price: 25, type: 'consumable', sub: 'herb', rarity: 'common', desc: "Kwaśne zioło toksyczne." },
+    { id: 103, name: "Korzeń Mandragory", price: 120, type: 'consumable', sub: 'herb', rarity: 'rare', desc: "Silny katalizator magiczny." },
+
+    // --- OLEJE (Natychmiastowe nałożenie przy kupnie / warzeniu) ---
+    { id: 301, name: "Olej na Trupojady", price: 80, type: 'consumable', sub: 'oil', rarity: 'common', desc: "🗡️ +50% ATK przeciwko Trupojadom w najbliższej bitwie.", targetClass: 'Trupojad' },
+    { id: 302, name: "Olej na Wampiry", price: 150, type: 'consumable', sub: 'oil', rarity: 'rare', desc: "🗡️ +50% ATK przeciw krwiopijcom w najbliższej bitwie.", targetClass: 'Wampir' },
+    { id: 303, name: "Olej na Drakonidy", price: 150, type: 'consumable', sub: 'oil', rarity: 'rare', desc: "🗡️ +50% ATK przeciw bestiom z nieba w najbliższej bitwie.", targetClass: 'Drakonid' },
+    { id: 304, name: "Olej na Relikty", price: 300, type: 'consumable', sub: 'oil', rarity: 'epic', desc: "🗡️ +50% ATK przeciw potężnym, wiecznym bestiom w najbliższej bitwie.", targetClass: 'Relikt' },
+
     // --- TALIZMANY (Mieszane bonusy) ---
     { id: 18, name: "Ząb Utopca", price: 400, atk: 8, type: 'trinket', rarity: 'common', desc: "Szczęście neofity." },
     { id: 19, name: "Medalion Wilka", price: 2500, maxHp: 300, type: 'trinket', rarity: 'rare', desc: "Wibruje w walce." },
@@ -214,24 +237,30 @@ const shopItems = [
 
 
 const monsterTemplates = {
-    // POZIOM 1-3: Rozgrzewka (HP: 150 - 800)
-    'utopiec': { name: 'Utopiec', hp: 200, atk: 20, arm: 5, reward: 80, style: 'normal', baseSpeed: 1.0, img: 'utopiec.webp' },
-    'ghul': { name: 'Ghul Alghul', hp: 450, atk: 35, arm: 15, reward: 160, style: 'charge', baseSpeed: 1.3, img: 'ghul.webp' },
-    'poludnica': { name: 'Południca', hp: 900, atk: 55, arm: 35, reward: 350, style: 'mirage', baseSpeed: 1.5, img: 'polodnica.webp' },
+    // POZIOM 1-3: Rozgrzewka
+    'utopiec': { name: 'Utopiec', classDesc: 'Trupojad', hp: 200, atk: 20, arm: 5, reward: 80, style: 'normal', baseSpeed: 1.0, img: 'utopiec.webp', isBoss: false },
+    'kikimora': { name: 'Kikimora Robotnica', classDesc: 'Istota Owadowata', hp: 320, atk: 28, arm: 8, reward: 110, style: 'combo', baseSpeed: 1.1, img: 'kikimora.webp', isBoss: false },
+    'ghul': { name: 'Ghul Alghul', classDesc: 'Trupojad', hp: 450, atk: 35, arm: 15, reward: 160, style: 'charge', baseSpeed: 1.3, img: 'ghul.webp', isBoss: false },
+    'baba_cmentarna': { name: 'Baba Cmentarna', classDesc: 'Trupojad', hp: 650, atk: 45, arm: 20, reward: 250, style: 'combo', baseSpeed: 1.4, img: 'baba.webp', isBoss: false },
+    'poludnica': { name: 'Południca', classDesc: 'Upiór', hp: 900, atk: 55, arm: 35, reward: 350, style: 'mirage', baseSpeed: 1.5, img: 'polodnica.webp', isBoss: false },
 
-    // POZIOM 4-6: Poważne zlecenia (HP: 2 000 - 8 000)
-    'gryf': { name: 'Gryf Królewski', hp: 2500, atk: 110, arm: 80, reward: 1200, style: 'charge', baseSpeed: 1.9, img: 'gryf.webp' },
-    'wilkolak': { name: 'Wilkołak', hp: 5000, atk: 180, arm: 150, reward: 2800, style: 'combo', baseSpeed: 2.3, img: 'wilkolak.webp' },
-    'leszy': { name: 'Starożytny Leszy', hp: 9500, atk: 280, arm: 250, reward: 5500, style: 'mirage', baseSpeed: 2.6, img: 'leszy.webp' },
+    // POZIOM 4-6: Poważne zlecenia
+    'bazyliszek': { name: 'Bazyliszek', classDesc: 'Drakonid', hp: 1600, atk: 80, arm: 55, reward: 750, style: 'blink', baseSpeed: 1.7, img: 'bazyliszek.webp', isBoss: false },
+    'golem': { name: 'Golem Ziemi', classDesc: 'Istota Magiczna', hp: 2200, atk: 150, arm: 200, reward: 1000, style: 'normal', baseSpeed: 0.8, img: 'golem.webp', isBoss: false },
+    'gryf': { name: 'Gryf Królewski', classDesc: 'Hybryda', hp: 3000, atk: 120, arm: 90, reward: 1400, style: 'charge', baseSpeed: 2.0, img: 'gryf.webp', isBoss: true },
+    'wilkolak': { name: 'Wilkołak', classDesc: 'Przeklęty', hp: 5000, atk: 180, arm: 150, reward: 2800, style: 'combo', baseSpeed: 2.3, img: 'wilkolak.webp', isBoss: false },
+    'wiwerna': { name: 'Królewska Wiwerna', classDesc: 'Drakonid', hp: 7200, atk: 220, arm: 190, reward: 4000, style: 'orbit', baseSpeed: 2.5, img: 'wiwerna.webp', isBoss: false },
+    'leszy': { name: 'Starożytny Leszy', classDesc: 'Relikt', hp: 9500, atk: 280, arm: 250, reward: 5500, style: 'mirage', baseSpeed: 2.6, img: 'leszy.webp', isBoss: true },
 
-    // POZIOM 7-9: Koszmary (HP: 20 000 - 80 000)
-    'bies': { name: 'Bies', hp: 22000, atk: 450, arm: 600, reward: 14000, style: 'blink', baseSpeed: 3.0, img: 'bies.webp' },
-    'stara_przadka': { name: 'Prządka', hp: 45000, atk: 850, arm: 1200, reward: 35000, style: 'orbit', baseSpeed: 3.4, img: 'przadka.webp' },
-    'detlaff': { name: 'Dettlaff van der Eretein', hp: 90000, atk: 1500, arm: 2500, reward: 85000, style: 'blink', baseSpeed: 4.0, img: 'detlaff.webp' },
+    // POZIOM 7-9: Koszmary
+    'bies': { name: 'Bies', classDesc: 'Relikt', hp: 22000, atk: 450, arm: 600, reward: 14000, style: 'blink', baseSpeed: 3.0, img: 'bies.webp', isBoss: true },
+    'garkain': { name: 'Garkain (Wampir)', classDesc: 'Wampir', hp: 35000, atk: 650, arm: 800, reward: 22000, style: 'charge', baseSpeed: 3.5, img: 'garkain.webp', isBoss: false },
+    'stara_przadka': { name: 'Prządka', classDesc: 'Relikt', hp: 45000, atk: 850, arm: 1200, reward: 35000, style: 'orbit', baseSpeed: 3.4, img: 'przadka.webp', isBoss: true },
+    'detlaff': { name: 'Dettlaff (Wampir Wyższy)', classDesc: 'Wampir Wyższy', hp: 90000, atk: 1500, arm: 2500, reward: 85000, style: 'blink', baseSpeed: 4.0, img: 'detlaff.webp', isBoss: true },
 
-    // POZIOM 10: Finał (HP: 250 000+)
-    'ukryty': { name: 'Ukryty Wyższy Wampir', hp: 250000, atk: 3500, arm: 6000, reward: 180000, style: 'blink', baseSpeed: 4.8, img: 'ukryty.webp' },
-    'pan_lusterko': { name: 'Gaunter o\'Dim', hp: 750000, atk: 8000, arm: 15000, reward: 500000, style: 'gaunter', baseSpeed: 5.5, img: 'gaunter.webp' }
+    // POZIOM 10: Finał
+    'ukryty': { name: 'Ukryty Wyższy Wampir', classDesc: 'Wampir Wyższy', hp: 250000, atk: 3500, arm: 6000, reward: 180000, style: 'blink', baseSpeed: 4.8, img: 'ukryty.webp', isBoss: true },
+    'pan_lusterko': { name: 'Gaunter o\'Dim', classDesc: 'Demon', hp: 750000, atk: 8000, arm: 15000, reward: 500000, style: 'gaunter', baseSpeed: 5.5, img: 'gaunter.webp', isBoss: true }
 };
 
 
@@ -259,15 +288,33 @@ function switchTab(tabId) {
     // 3. Wywołujemy funkcje odświeżające widok
     if (tabId === 'char') {
         renderInventory();
-        renderSignSelection();
     }
-    if (tabId === 'shop') renderShop();
+    if (tabId === 'shop') renderShop('blacksmith');
     if (tabId === 'hunt') renderMonsterBoard();
+    if (tabId === 'alchemy') renderAlchemy();
     if (tabId === 'menu' || tabId === 'tutorial') updateUI();
 
     // TRENING: Tylko generujemy listę potworów "w tle"
     if (tabId === 'training') {
         renderTrainingMonsterList();
+    }
+
+    // Dynamiczny Tutorial
+    const t = stats.tutorialsSeen;
+    if (t) {
+        if (tabId === 'hunt' && !t.hunt) {
+            t.hunt = true;
+            openModal("📜 Witaj na szlaku!", "Wybierz 'Utopca'. Walka to klikanie w przycisk UNIK na ułamek sekundy przed ciosem potwora. Pamiętaj by korzystać ze znaków!", () => { saveGame(); });
+        } else if (tabId === 'shop' && !t.shop) {
+            t.shop = true;
+            openModal("📜 Bazar w Novigradzie", "Złoto wydawaj na ekwipunek i eliksiry. Kowal sprzedaje zbroje, Zielarka zioła, a Kupiec talizmany i petardy.", () => { saveGame(); });
+        } else if (tabId === 'char' && !t.inventory) {
+            t.inventory = true;
+            openModal("📜 Przygotowanie wiedźmina", "Kliknij na zakupiony przedmiot by go założyć (jego tło pociemnieje). Wybierz 3 aktywne znaki do wali spośród 5!", () => { saveGame(); });
+        } else if (tabId === 'training' && !t.training) {
+            t.training = true;
+            openModal("📜 Trening", "Symuluj walkę z odblokowanymi bestiami bez ryzyka utraty złota po śmierci! Świetne miejsce do opanowania uników.", () => { saveGame(); });
+        }
     }
 }
 
@@ -340,24 +387,45 @@ function handleMonsterClick(monsterKey) {
     // Definiujemy "Gotowość": jeśli Twój atak jest mniejszy niż 70% pancerza wroga, będzie ciężko
     const isReady = stats.atk > (m.arm * 0.7);
 
+    const onStart = () => {
+        if (m.isBoss) {
+            openModal(
+                "⚠️ WALKA Z BOSSEM",
+                `Rozpoczynasz walkę z BOSSEM: ${m.name.toUpperCase()}. Z tej walki NIE BĘDZIE UCIECZKI. Czy jesteś gotowy umrzeć?`,
+                () => startBattle(monsterKey)
+            );
+        } else {
+            startBattle(monsterKey);
+        }
+    };
+
     if (!isReady) {
         openModal(
             "⚠️ OSTRZEŻENIE",
             `Twoja broń może być za słaba na pancerz ${m.name.toUpperCase()}. Zadawane obrażenia będą minimalne. Czy na pewno chcesz podjąć zlecenie?`,
-            () => startBattle(monsterKey)
+            () => onStart()
         );
     } else {
-        startBattle(monsterKey);
+        onStart();
     }
 }
 
 
-function renderShop(filter = 'all') {
+function renderShop(merchantType = 'blacksmith') {
     const list = document.getElementById('shop-list');
     if (!list) return;
 
     // 1. FILTROWANIE
-    let filtered = filter === 'all' ? [...shopItems] : shopItems.filter(i => i.type === filter);
+    let filtered = [];
+    if (merchantType === 'blacksmith') {
+        filtered = shopItems.filter(i => i.type === 'weapon' || i.type === 'armor');
+    } else if (merchantType === 'herbalist') {
+        filtered = shopItems.filter(i => i.type === 'consumable' && (i.sub === 'herb' || i.sub === 'pot' || i.sub === 'pot_full' || i.sub === 'oil'));
+    } else if (merchantType === 'merchant') {
+        filtered = shopItems.filter(i => i.type === 'trinket' || (i.type === 'consumable' && i.sub !== 'herb' && i.sub !== 'pot' && i.sub !== 'pot_full' && i.sub !== 'oil'));
+    } else {
+        filtered = shopItems.filter(i => i.type === merchantType); // fallback
+    }
 
     // 2. PANCERNE SORTOWANIE (Od najniższej ceny do najwyższej)
     filtered.sort((a, b) => a.price - b.price);
@@ -388,8 +456,8 @@ function renderShop(filter = 'all') {
 
     // Opcjonalne: Dodanie klasy active do przycisków filtrów
     document.querySelectorAll('.shop-filters button').forEach(btn => {
-        btn.classList.remove('active');
-        if (btn.getAttribute('onclick').includes(`'${filter}'`)) btn.classList.add('active');
+        btn.style.borderColor = 'transparent';
+        if (btn.getAttribute('onclick').includes(`'${merchantType}'`)) btn.style.borderBottomColor = 'var(--gold)';
     });
 }
 
@@ -407,26 +475,40 @@ function renderInventory() {
     if (inventory.length === 0) {
         list.innerHTML = "<div style='color:#666; padding:20px; text-align:center;'>Juki są puste...</div>";
     } else {
-        list.innerHTML = inventory.map((item, index) => {
-            const isEquipped = Object.values(equipped).includes(item);
-            const itemJson = JSON.stringify(item).replace(/"/g, '&quot;');
+        const types = [
+            { id: 'weapon', name: '⚔️ Bronie' },
+            { id: 'armor', name: '🛡️ Pancerze' },
+            { id: 'consumable', name: '🧪 Użytkowe i Zioła' },
+            { id: 'trinket', name: '💍 Talizmany' }
+        ];
+
+        list.innerHTML = types.map(t => {
+            const itemsOfType = inventory.filter(i => i.type === t.id);
+            if (itemsOfType.length === 0) return '';
 
             return `
-            <div class="item-card item-${item.rarity}" 
-                 style="opacity: ${isEquipped ? '0.5' : '1'}" 
-                 onclick="openItemPreview(null, false, ${index})"
-                 onmouseenter="showTooltip(event, 'item', ${itemJson})" 
-                 onmousemove="moveTooltip(event)" 
-                 onmouseleave="hideTooltip()">
-                <div class="item-info">
-                    <div class="item-type-icon">${item.type} | ${item.rarity}</div>
-                    <div class="item-name">${item.name} ${isEquipped ? '(ZAŁOŻONO)' : ''}</div>
-                </div>
+            <div style="font-weight:bold; color:var(--gold); margin: 15px 0 5px 0; border-bottom: 1px solid #333; text-align: left;">${t.name}</div>
+            <div style="display:flex; flex-direction:column; gap:5px;">
+                ${itemsOfType.map(item => {
+                const invIndex = inventory.indexOf(item);
+                const isEquipped = Object.values(equipped).includes(item);
+                const itemJson = JSON.stringify(item).replace(/"/g, '&quot;');
+                return `
+                    <div class="item-card item-${item.rarity}" 
+                         style="opacity: ${isEquipped ? '0.5' : '1'}" 
+                         onclick="openItemPreview(null, false, ${invIndex})"
+                         onmouseenter="showTooltip(event, 'item', ${itemJson})" 
+                         onmousemove="moveTooltip(event)" 
+                         onmouseleave="hideTooltip()">
+                        <div class="item-info">
+                            <div class="item-type-icon">${item.rarity}</div>
+                            <div class="item-name">${item.name} ${isEquipped ? '(ZAŁOŻONO)' : ''}</div>
+                        </div>
+                    </div>`;
+            }).join('')}
             </div>`;
         }).join('');
     }
-
-    renderSignSelection(); // Wywołujemy uniwersalny wybór znaków
 }
 
 function updateUI() {
@@ -482,6 +564,13 @@ function buyItem(id) {
         else if (item.sub === 'bomb') {
             if (stats.bomb >= 10) return showToast("Max 10 petard!");
             stats.bomb++;
+        }
+        else if (item.sub === 'oil') {
+            stats.activeOil = item.targetClass;
+            showToast(`Olej nałożono na klingę! (+50% DMG vs ${item.targetClass})`, "#d4af37");
+            updateUI();
+            saveGame();
+            return; // Kończymy akcję dla oleju bez pobierania kopii do ekwipunku
         }
         else if (item.sub === 'atk_perm') stats.atk += 5;
         else if (item.sub === 'arm_perm') stats.arm += 5;
@@ -560,9 +649,9 @@ function unequip(type) {
     if (!item) return;
 
     // 1. Odejmij bonusy
-    if (item.atk) stats.atk -= item.atk;
-    if (item.arm) stats.arm -= item.arm;
-    if (item.agi) stats.agi -= item.agi;
+    if (item.atk) stats.atk = Math.max(1, stats.atk - item.atk);
+    if (item.arm) stats.arm = Math.max(0, stats.arm - item.arm);
+    if (item.agi) stats.agi = Math.max(1, stats.agi - item.agi);
 
     // 2. PANCERNA LOGIKA HP: Postać nie może umrzeć od zdjęcia zbroi
     if (item.maxHp) {
@@ -589,13 +678,14 @@ function startBattle(monsterKey, forcedHp = null) {
     battleState.active = true;
     battleState.quenActive = false;
     battleState.igniBuffTicks = 0;
-    signsUsed = { igni: false, quen: false, yrden: false, axii: false, aard: false };
+    signsCooldown = { igni: 0, quen: 0, yrden: 0, axii: 0, aard: 0 };
 
     monster = {
         ...data,
         key: monsterKey,
-        maxHp: data.hp,
-        hp: forcedHp !== null ? forcedHp : data.hp,
+        maxHp: Math.floor(data.hp * stats.difficultyMult),
+        hp: forcedHp !== null ? forcedHp : Math.floor(data.hp * stats.difficultyMult),
+        atk: Math.floor(data.atk * stats.difficultyMult),
         arm: data.arm || 0,
         style: data.style || 'normal',
         baseSpeed: data.baseSpeed || 1.0,
@@ -617,7 +707,7 @@ function startBattle(monsterKey, forcedHp = null) {
     playerTurnActive = true;
     document.getElementById('battleActions').style.display = 'grid';
     document.getElementById('battleActions').style.opacity = "1";
-    document.getElementById('exitBattleBtn').style.display = "none";
+    document.getElementById('exitBattleBtn').style.display = monster.isBoss ? "none" : "flex";
     document.getElementById('finishBtn').style.display = 'none';
 
     updateMonsterHP();
@@ -635,7 +725,7 @@ function startBattle(monsterKey, forcedHp = null) {
 
 function finishBattle() {
     stopDodgeMove();
-    signsUsed = { igni: false, quen: false, yrden: false, axii: false, aard: false };
+    signsCooldown = { igni: 0, quen: 0, yrden: 0, axii: 0, aard: 0 };
 
     // 1. PANCERNY RESET SZALU: Usuwamy klasę wizualną z paska HP potwora
     const mHpBarContainer = document.getElementById('mHpBar').parentElement;
@@ -689,8 +779,9 @@ function handleAction(type) {
                 { minSpeed: 2.5, maxSpeed: 4.5, size: 85 });
         },
         'igni': () => {
-            if (signsUsed.igni) return;
-            signsUsed.igni = true;
+            if (signsCooldown.igni > 0) return showToast(`Znak Igni ładuje się jeszcze ${signsCooldown.igni} tur!`, "gray");
+            signsCooldown.igni = signsMaxCooldown.igni;
+            stats.signXp.igni = (stats.signXp.igni || 0) + 1;
             openWitcherPanel('none');
 
             let igniDmg = 20 + Math.floor(stats.atk * 0.4);
@@ -704,8 +795,9 @@ function handleAction(type) {
                 { minSpeed: 2.5, maxSpeed: 4.5, size: 80 });
         },
         'quen': () => {
-            if (signsUsed.quen) return;
-            signsUsed.quen = true;
+            if (signsCooldown.quen > 0) return showToast(`Znak Quen ładuje się jeszcze ${signsCooldown.quen} tur!`, "gray");
+            signsCooldown.quen = signsMaxCooldown.quen;
+            stats.signXp.quen = (stats.signXp.quen || 0) + 1;
             openWitcherPanel('none');
 
             quenActive = true;
@@ -721,37 +813,43 @@ function handleAction(type) {
             setTimeout(monsterTurn, 800);
         },
         'yrden': () => {
-            if (signsUsed.yrden) return;
-            signsUsed.yrden = true;
+            if (signsCooldown.yrden > 0) return showToast(`Znak Yrden ładuje się jeszcze ${signsCooldown.yrden} tur!`, "gray");
+            signsCooldown.yrden = signsMaxCooldown.yrden;
+            stats.signXp.yrden = (stats.signXp.yrden || 0) + 1;
             openWitcherPanel('none');
 
-            monster.yrdenTicks = 4; // <--- WZMOCNIENIE: Z 3 na 5 tur
-            addLog("YRDEN! Pułapka ekstremalnie spowalnia ruchy bestii.", "#8a2be2");
+            monster.yrdenTicks = 5; // WZMOCNIENIE: Z 3 na 5 tur (-50% szybkości)
+            addLog("YRDEN! Pułapka ekstremalnie spowalnia bestię na 5 tur (-50% szybkości).", "#8a2be2");
 
             playerTurnActive = true;
             document.getElementById('battleActions').style.opacity = "1";
         },
         'axii': () => {
-            if (signsUsed.axii) return;
-            signsUsed.axii = true;
+            if (signsCooldown.axii > 0) return showToast(`Znak Axii ładuje się jeszcze ${signsCooldown.axii} tur!`, "gray");
+            signsCooldown.axii = signsMaxCooldown.axii;
+            stats.signXp.axii = (stats.signXp.axii || 0) + 1;
             openWitcherPanel('none');
 
-            monster.axiiTicks = 6; // Krótszy czas trwania na starcie
-            addLog("AXII! Potwór traci rezon.", "#50c878");
+            monster.axiiTicks = 4; // Czas trwania na nowym poziomie balansowania
+            addLog("AXII! Potwór traci rezon. Przerywasz jego szał, a ataki stają się klasyczne!", "#50c878");
+
+            const container = document.getElementById('mainContainer');
+            container.classList.add('axii-effect');
+            setTimeout(() => container.classList.remove('axii-effect'), 500);
 
             playerTurnActive = true;
             document.getElementById('battleActions').style.opacity = "1";
         },
         'aard': () => {
-            if (signsUsed.aard) return;
-            signsUsed.aard = true;
+            if (signsCooldown.aard > 0) return showToast(`Znak Aard ładuje się jeszcze ${signsCooldown.aard} tur!`, "gray");
+            signsCooldown.aard = signsMaxCooldown.aard;
+            stats.signXp.aard = (stats.signXp.aard || 0) + 1;
             openWitcherPanel('none');
 
-            // TRWAŁE OSŁABIENIE (Punkt 1)
-            monster.arm = Math.floor(monster.arm * 0.7); // Wróg traci 30% pancerza
-            stats.arm = Math.floor(stats.arm * 0.85);    // Ty tracisz 15% pancerza (ryzyko!)
+            // TRWAŁE OSŁABIENIE (Zbalansowane)
+            monster.arm = Math.floor(monster.arm * 0.85); // Wróg traci 15% pancerza
 
-            addLog("AARD! Fala uderzeniowa rozbiła pancerze obu walczących!", "#87ceeb");
+            addLog("AARD! Fala uderzeniowa rozbiła pancerz wroga o 15%!", "#87ceeb");
 
             // NIE KOŃCZY TURY (Punkt 1)
             playerTurnActive = true;
@@ -822,7 +920,13 @@ function handleAction(type) {
             msg += " (Płonące ostrze!)";
         }
 
-        // 3. Krytyk
+        // 3. OLEJ (Kluczowa klasyfikacyjna przewaga)
+        if (stats.activeOil === monster.classDesc) {
+            finalDmg = Math.floor(finalDmg * 1.5);
+            msg += " (Zabójczy Olej!)";
+        }
+
+        // 4. Krytyk
         let isCrit = Math.random() < critChance;
         if (isCrit) {
             finalDmg = Math.floor(finalDmg * 2.5);
@@ -894,6 +998,7 @@ function monsterTurn() {
     const agiBonus = 1 + (stats.agi - 10) * 0.02;
 
     let activeStyleKey = monster.style;
+    if (monster.axiiTicks > 0) activeStyleKey = 'normal'; // AXII OVERRIDE
     let styleData = BATTLE_STYLES[activeStyleKey] || BATTLE_STYLES['normal'];
 
     if (activeStyleKey === 'gaunter') {
@@ -938,6 +1043,10 @@ function monsterTurn() {
 
     if (activeStyleKey === 'combo') reactionTime *= 0.8;
 
+    // Zmniejszenie cooldownów znaków
+    Object.keys(signsCooldown).forEach(k => {
+        if (signsCooldown[k] > 0) signsCooldown[k]--;
+    });
 
     if (isYrdenActive) monster.yrdenTicks--;
     const monsterIndex = Object.keys(monsterTemplates).indexOf(monster.key) || 0;
@@ -986,10 +1095,13 @@ function doDodge() {
         dBtn.innerText = `KLIKNIJ x${hitsNeeded}`;
 
         // 1. PANCERNE WYLICZANIE CZASU (Punkt 8)
-        // Baza to 1000ms. Dzielimy przez baseSpeed potwora i dodajemy bonus za Twoją zwinność.
-        // Formuła: 1000ms / (SzybkośćPotwora * BonusTwojejZwinności)
-        const agiBonus = 1 + (stats.agi - 10) * 0.02; // Każdy punkt ponad 10 daje 2% więcej czasu
-        const reactionWindow = Math.max(300, 1100 / (monster.baseSpeed * agiBonus));
+        let effectiveSpeed = monster.baseSpeed;
+        if (monster.yrdenTicks && monster.yrdenTicks > 0) {
+            effectiveSpeed *= 0.5; // Potężne 50% spowolnienia na bossów i potwory!
+        }
+
+        const agiBonus = 1 + (stats.agi - 10) * 0.02;
+        const reactionWindow = Math.max(400, (1500 / (effectiveSpeed * agiBonus)));
 
         // 2. AKTUALIZACJA POZYCJI (Z poprzedniej poprawki)
         if (dBtn._moveState) {
@@ -1308,7 +1420,8 @@ function openWitcherPanel(type) {
         const signIcons = { igni: '🔥', quen: '🛡️', yrden: '🔮', axii: '🌀', aard: '💨' };
 
         selectedSigns.forEach(id => {
-            const isUsed = signsUsed[id];
+            const cd = signsCooldown[id];
+            const isUsed = cd > 0;
             const icon = signIcons[id] || '✨';
 
             wrapper.innerHTML += `
@@ -1319,7 +1432,7 @@ function openWitcherPanel(type) {
                         ${isUsed ? 'disabled' : ''} 
                         style="width:100%; margin-bottom:10px;">
                     <span style="font-size:1.2rem;">${icon}</span>
-                    <span>${id.toUpperCase()} ${isUsed ? '(WYCZERPANY)' : ''}</span>
+                    <span>${id.toUpperCase()} ${isUsed ? '(ZA ' + cd + ' TUR)' : ''}</span>
                 </button>`;
         });
     }
@@ -1435,9 +1548,12 @@ function loadGame() {
         const data = JSON.parse(saved);
         stats = data.stats;
 
-        if (stats.maxUnlockedIndex === undefined) {
-            stats.maxUnlockedIndex = 0;
-        }
+        if (stats.maxUnlockedIndex === undefined) stats.maxUnlockedIndex = 0;
+        if (stats.playerName === undefined) stats.playerName = 'Geralt';
+        if (stats.signUpgrades === undefined) stats.signUpgrades = { igni: 0, quen: 0, yrden: 0, axii: 0, aard: 0 };
+        if (stats.signXp === undefined) stats.signXp = { igni: 0, quen: 0, yrden: 0, axii: 0, aard: 0 };
+        const pnInput = document.getElementById('playerName');
+        if (pnInput) pnInput.value = stats.playerName;
 
         inventory = data.inventory || [];
         if (data.equippedIds) {
@@ -1449,6 +1565,9 @@ function loadGame() {
                 }
             });
         }
+    } else {
+        // Jeśli nie było zapisu, pokazujemy modal poziomu trudności
+        document.getElementById('difficulty-modal').style.display = 'flex';
     }
 
     // PANCERNY MECHANIZM REANIMACJI WALKI
@@ -1487,6 +1606,19 @@ function openModal(title, text, onConfirm) {
     };
 }
 
+function setDifficulty(name, mult) {
+    stats.difficultyName = name;
+    stats.difficultyMult = mult;
+    document.getElementById('difficulty-modal').style.display = 'none';
+    showToast(`Oto Twój szlak: ${name}`, "var(--gold)");
+    saveGame();
+}
+
+function openSaveMenu() { document.getElementById('save-modal').style.display = 'flex'; }
+function closeSaveMenu() { document.getElementById('save-modal').style.display = 'none'; }
+function manualSave() { saveGame(); showToast("Zapis ręczny utworzony!", "#2ecc71"); closeSaveMenu(); }
+function manualLoad() { loadGame(); showToast("Zapis wczytany!", "#2ecc71"); closeSaveMenu(); }
+
 function confirmReset() {
     openModal(
         "PORZUCENIE SZLAKU",
@@ -1517,14 +1649,21 @@ function resetGame() {
         bomb: 0,
         hp: 100,
         maxHp: 100,
-        igniBuffTicks: 0,
-        maxUnlockedIndex: 0
+        maxUnlockedIndex: 0,
+        difficultyMult: 1.0,
+        difficultyName: 'Wyzwanie',
+        playerName: 'Geralt',
+        signUpgrades: { igni: 0, quen: 0, yrden: 0, axii: 0, aard: 0 },
+        signXp: { igni: 0, quen: 0, yrden: 0, axii: 0, aard: 0 },
+        tutorialsSeen: { hunt: false, shop: false, inventory: false, training: false }
     };
+
+    const pnInput = document.getElementById('playerName');
+    if (pnInput) pnInput.value = "Geralt";
 
     inventory = [];
     equipped = { weapon: null, armor: null, trinket: null };
-    selectedSigns = ['igni', 'quen', 'yrden']; // Reset domyślnych znaków
-    signsUsed = { igni: false, quen: false, yrden: false, axii: false, aard: false };
+    signsCooldown = { igni: 0, quen: 0, yrden: 0, axii: 0, aard: 0 };
 
     updateUI();
     renderInventory();
@@ -1551,8 +1690,8 @@ function applyStyleBehavior(dBtn, area, posX, posY, customMoveX, customMoveY, sh
     dBtn.style.pointerEvents = "auto";
 
     // --- LOGIKA MONSTER FRENZY ---
-    // Jeśli potwór ma poniżej 30% HP, wpada w szał (+25% do prędkości)
-    const isFrenzy = (monster.hp / monster.maxHp) <= 0.3;
+    // Jeśli potwór ma poniżej 30% HP, wpada w szał (+25% do prędkości). Axii to anuluje.
+    const isFrenzy = ((monster.hp / monster.maxHp) <= 0.3) && !(monster.axiiTicks > 0);
     const frenzyMult = isFrenzy ? 1.25 : 1.0;
 
     // Wizualizacja szału na pasku HP
@@ -1912,10 +2051,184 @@ function startMonsterSimulation(monsterKey) {
     if (mImg) mImg.src = m.img;
 
     // 4. LOGOWANIE SYSTEMOWE
-    addLog(`SYMULACJA: ${m.name}. Styl bazowy: ${BATTLE_STYLES[m.style].name}`, "var(--gold)");
+    addLog(`SYMULACJA: ${m.name}. Klasa: ${m.classDesc || 'Brak'}`, "var(--gold)");
 }
 
+// ------------------- ALCHEMIA SYSTEM -------------------
+let cauldronItems = [];
 
+function renderAlchemy() {
+    const list = document.getElementById('herbs-list');
+    if (!list) return;
+
+    let herbs = inventory.filter(i => i.sub === 'herb');
+    if (herbs.length === 0) {
+        list.innerHTML = "<div style='color:gray;'>Brak ziół w ekwipunku... Kup coś u Zielarki na Bazarze.</div>";
+    } else {
+        list.innerHTML = herbs.map((item, index) => {
+            return `<button class="menu-btn" onclick="addToCauldron('${item.id}', ${index})" style="font-size:0.7rem; padding: 5px; flex: 1 1 30%; max-width: 30%;">+ ${item.name}</button>`;
+        }).join('');
+    }
+    document.getElementById('cauldron-count').innerText = cauldronItems.length;
+}
+
+function addToCauldron(id, invIndex) {
+    if (cauldronItems.length >= 3) {
+        showToast("Kocioł jest pełny! (Max 3 składniki)", "red");
+        return;
+    }
+    // Pobieramy prawdziwy index z pośród wszystkich ziół, ale musimy go znaleźć w całym ekwipunku
+    // Z uwagi na filter, lepiej szukać po bezpośrednio znalezieniu 1 wystąpienia.
+    const realIndex = inventory.findIndex(i => i.id == id);
+    if (realIndex !== -1) {
+        cauldronItems.push(inventory[realIndex]);
+        inventory.splice(realIndex, 1);
+        renderAlchemy();
+    }
+}
+
+function brewPotion() {
+    if (cauldronItems.length < 2) {
+        showToast("Wrzuć co najmniej 2 zioła do Kotła!", "gray");
+        return;
+    }
+
+    // Potęzna fuzja ziół dająca prawdziwe potki i OLEJE!
+    const names = cauldronItems.map(i => i.name).join('');
+    const cauld = document.getElementById('cauldron');
+    cauld.style.transform = "rotate(360deg)";
+
+    setTimeout(() => {
+        cauld.style.transform = "none";
+        if (names.includes('Jaskółcze') && cauldronItems.length >= 2) {
+            stats.pot++;
+            addLog("WIEDZA ALCHEMICZNA! Stworzono: 🧪 Jaskółka", "#2ecc71");
+        } else if (names.includes('Szczawik') && cauldronItems.length >= 2) {
+            stats.bomb++;
+            addLog("WIEDZA ALCHEMICZNA! Stworzono: 💣 Samum", "#ff4500");
+        } else if (names.includes('Mandragory')) {
+            // Dodajemy olej wiedźmiński zamiast po prostu + Ataku! Zrobiłem olej na wampiry jako potka, która jednorazowo... dla uproszczenia nadal może dodawać atak po prostu, bo system walki nie obsługuje ekwipunku-buffów zaawansowanych.
+            // Lub stworzymy mu i przypniemy nowy item "Olej".
+            // Dodam mu permanentne zwiększenie ataku jako "Wiedza Wiedźmińska o anatomi wroga".
+            stats.atk += 2;
+            addLog("WIEDZA ALCHEMICZNA! Mutageniczny Olej z Mandragory nałożony na stałe na pancerz: +2 Ataku!", "#d4af37");
+        } else {
+            stats.maxHp += 5;
+            addLog("Breja... Ale wzmacnia krzepę! +5 Max HP", "gray");
+        }
+
+        cauldronItems = [];
+        renderAlchemy();
+        updateUI();
+        saveGame();
+    }, 400);
+}
+
+function emptyCauldron() {
+    cauldronItems.forEach(h => inventory.push(h));
+    cauldronItems = [];
+    renderAlchemy();
+}
+
+// ------------------- SKRÓTY KLAWISZOWE -------------------
+document.addEventListener('keydown', (e) => {
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+
+    if (e.key === 'Escape') {
+        const modal = document.getElementById('custom-modal');
+        if (modal && modal.style.display === 'flex') {
+            document.getElementById('modal-cancel-btn').click();
+            return;
+        }
+
+        const difModal = document.getElementById('difficulty-modal');
+        if (difModal && difModal.style.display === 'flex') return; // Nie zamknie wyboru trundności
+
+        const saveModal = document.getElementById('save-modal');
+        if (saveModal && saveModal.style.display === 'flex') {
+            closeSaveMenu();
+            return;
+        }
+
+        const sideMenu = document.querySelector('.side-panel');
+        if (sideMenu && sideMenu.classList.contains('active')) {
+            closeSideMenu();
+            return;
+        }
+
+        const gameContainer = document.getElementById('game');
+        if (gameContainer && gameContainer.style.display === 'block') {
+            const exitBtn = document.getElementById('exitBattleBtn');
+            if (exitBtn && exitBtn.style.display !== 'none') {
+                exitBtn.click();
+            }
+            return;
+        }
+
+        const menu = document.getElementById('menu');
+        if (menu && menu.style.display !== 'block') {
+            switchTab('menu');
+        }
+    }
+});
+
+// ------------------- INNE / WIEDŹMIN -------------------
+function saveName(val) {
+    stats.playerName = val || "Wiedźmin";
+    saveGame();
+    showToast(`Witaj, ${stats.playerName}!`, "#4caf50");
+}
+
+function tryUpgradeSign(signId) {
+    const level = stats.signUpgrades[signId];
+    const xp = stats.signXp[signId] || 0;
+    const cost = 5 + (level * 5); // Koszt w punktach doświadczenia ZNAKU: najpierw 5 użyć, potem 10, itd.
+
+    if (xp >= cost) {
+        if (signsMaxCooldown[signId] <= 1) {
+            showToast("Znak osiągnął Maksymalny Poziom Biegłości!", "gray");
+            return;
+        }
+        stats.signXp[signId] -= cost;
+        stats.signUpgrades[signId]++;
+        signsMaxCooldown[signId]--;
+        saveGame();
+        updateUI();
+        showToast(`Biegłość w znaku ${signId.toUpperCase()} zrosła! Serce wali Wolniej...`, "var(--gold)");
+        upgradeSignsUI();
+    } else {
+        showToast(`Masz zbyt mało biegłości (${xp}/${cost} wymaganych użyć w walce)`, "red");
+    }
+}
+
+function upgradeSignsUI() {
+    const sideMenu = document.getElementById('sideMenuContainer');
+    sideMenu.innerHTML = '';
+    const wrapper = document.createElement('div');
+    wrapper.className = 'panel-content visible';
+    wrapper.innerHTML = `<h4>✨ DRZEWKO ZNAKÓW</h4>
+    <p style="font-size:0.7rem; color:#ccc; margin-bottom:10px;">Z każdym bojowym wyrzuceniem znaku zdobywasz w nim Biegłość (XP). Użyj Biegłości, by wyostrzyć umysł i odmawiać mrok szybciej (niższy Cooldown).</p>`;
+
+    Object.keys(signsMaxCooldown).forEach(id => {
+        const level = stats.signUpgrades[id];
+        const xp = stats.signXp[id] || 0;
+        const cost = 5 + (level * 5);
+        const maxed = signsMaxCooldown[id] <= 1;
+
+        wrapper.innerHTML += `
+            <button onclick="tryUpgradeSign('${id}')" style="width:100%; margin-bottom:10px; padding: 10px; background: ${maxed ? '#111' : (xp >= cost ? 'var(--gold)' : '#222')}; color: ${(xp >= cost && !maxed) ? '#000' : '#fff'}; border: 1px solid ${maxed ? '#111' : 'var(--gold)'}; text-align: left;">
+                <div style="font-weight: bold; font-size: 1rem;">${id.toUpperCase()} <span style="font-size:0.7rem;">(Lvl ${level})</span></div>
+                <div style="font-size: 0.75rem;">Odzysk energii po ${signsMaxCooldown[id]} turach.</div>
+                <div style="margin-top: 5px; font-size:0.7rem; color:${maxed ? 'gray' : (xp >= cost ? '#000' : '#2ecc71')};">
+                    ${maxed ? 'MAKSYMALNA BIEGŁOŚĆ' : `Wymagana Biegłość: ${xp} / ${cost} Użyć`}
+                </div>
+            </button>`;
+    });
+
+    wrapper.innerHTML += `<button onclick="closeSideMenu()" class="btn-close" style="width:100%; margin-top:auto;">ZAMKNIJ OŚWIECENIE</button>`;
+    sideMenu.appendChild(wrapper);
+    sideMenu.classList.add('active');
+}
 
 
 
