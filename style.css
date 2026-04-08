@@ -25,6 +25,7 @@ body {
     background: radial-gradient(circle, #2a2a2a 0%, #111 100%);
     min-height: 600px;
     text-align: center;
+    overflow: auto;
     /* Centruje wszystko wewnątrz */
 }
 
@@ -1546,4 +1547,76 @@ button:hover {
         transform: scale(1.02);
         filter: brightness(1.5);
     }
+}
+/* --- TUTORIAL CSS --- */
+#tutorial-overlay {
+    position: fixed;
+    top: 0; left: 0; width: 100vw; height: 100vh;
+    background: rgba(0, 0, 0, 0.85);
+    z-index: 90000;
+    display: none;
+}
+#tutorial-bubble {
+    position: fixed;
+    top: 40px; right: 40px;
+    width: 250px;
+    background: #e2d1b0;
+    color: #2c1e14;
+    padding: 20px;
+    border: 2px solid #8e6d13;
+    border-radius: 8px;
+    box-shadow: 0 0 20px rgba(218,165,32,0.4);
+    z-index: 90001;
+    font-family: 'Georgia', serif;
+    display: none;
+    flex-direction: column;
+    animation: bubblePulse 2s infinite alternate;
+}
+@keyframes bubblePulse {
+    from { box-shadow: 0 0 10px rgba(218,165,32,0.3); }
+    to { box-shadow: 0 0 25px rgba(218,165,32,0.8); }
+}
+.tutorial-highlight {
+    position: relative !important;
+    z-index: 90002 !important;
+    pointer-events: auto !important;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.4) !important;
+}
+.tutorial-highlight-pulse {
+    position: relative !important;
+    z-index: 90002 !important;
+    pointer-events: auto !important;
+    animation: itemHighlightPulse 1.5s infinite alternate !important;
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.8) !important;
+}
+@keyframes itemHighlightPulse {
+    from { transform: scale(1); }
+    to { transform: scale(1.05); }
+}
+.tutorial-disable-clicks {
+    pointer-events: none !important;
+}
+.tutorial-bubble-btn {
+    margin-top: 15px;
+    background: #2c1e14;
+    color: #e2d1b0;
+    border: 1px solid #111;
+    padding: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    text-align: center;
+}
+/* Left side position for some steps */
+#tutorial-bubble.left-side {
+    right: auto;
+    left: 40px;
+}
+
+.monster-grid-scrollable {
+    height: 480px;
+    overflow-y: scroll;
+    padding-right: 10px;
+    border: 1px solid #444;
+    background: #181818;
+    border-radius: 8px;
 }

@@ -9,7 +9,7 @@ let currentCombo = 0; // Dla stylu 'combo'
 let hitsNeeded = 1; // Ile razy trzeba kliknąć (dla stylu Combo)
 let isMirageActive = false; // Czy aktualnie trwa Miraż
 let signsCooldown = { igni: 0, quen: 0, yrden: 0, axii: 0, aard: 0 };
-let signsMaxCooldown = { igni: 3, quen: 4, yrden: 5, axii: 4, aard: 5 };
+let signsMaxCooldown = { igni: 3, quen: 4, yrden: 10, axii: 4, aard: 5 }; // YRDEN NERF/BUFF: Czas na 10 tur po zakończeniu efektu!
 let dodgeIntervals = []; // Tablica na wszystkie aktywne interwały
 let currentTurnTimer;
 let selectedSigns = ['igni', 'quen', 'yrden']; // Domyślne 3 znaki
@@ -300,21 +300,8 @@ function switchTab(tabId) {
     }
 
     // Dynamiczny Tutorial
-    const t = stats.tutorialsSeen;
-    if (t) {
-        if (tabId === 'hunt' && !t.hunt) {
-            t.hunt = true;
-            openModal("📜 Witaj na szlaku!", "Wybierz 'Utopca'. Walka to klikanie w przycisk UNIK na ułamek sekundy przed ciosem potwora. Pamiętaj by korzystać ze znaków!", () => { saveGame(); });
-        } else if (tabId === 'shop' && !t.shop) {
-            t.shop = true;
-            openModal("📜 Bazar w Novigradzie", "Złoto wydawaj na ekwipunek i eliksiry. Kowal sprzedaje zbroje, Zielarka zioła, a Kupiec talizmany i petardy.", () => { saveGame(); });
-        } else if (tabId === 'char' && !t.inventory) {
-            t.inventory = true;
-            openModal("📜 Przygotowanie wiedźmina", "Kliknij na zakupiony przedmiot by go założyć (jego tło pociemnieje). Wybierz 3 aktywne znaki do wali spośród 5!", () => { saveGame(); });
-        } else if (tabId === 'training' && !t.training) {
-            t.training = true;
-            openModal("📜 Trening", "Symuluj walkę z odblokowanymi bestiami bez ryzyka utraty złota po śmierci! Świetne miejsce do opanowania uników.", () => { saveGame(); });
-        }
+    if (stats.tutorialsSeen && tabId !== 'menu') {
+        startAdHocTutorial(tabId);
     }
 }
 
@@ -1043,16 +1030,21 @@ function monsterTurn() {
 
     if (activeStyleKey === 'combo') reactionTime *= 0.8;
 
-    // Zmniejszenie cooldownów znaków
-    Object.keys(signsCooldown).forEach(k => {
-        if (signsCooldown[k] > 0) signsCooldown[k]--;
-    });
+    // Zmniejszenie cooldownów znaków Z PANCERNĄ PAUZĄ (Czekają na zgaśnięcie efektu!)
+    if (signsCooldown.igni > 0 && battleState.igniBuffTicks <= 0) signsCooldown.igni--;
+    if (signsCooldown.yrden > 0 && monster.yrdenTicks <= 0) signsCooldown.yrden--;
+    if (signsCooldown.axii > 0 && monster.axiiTicks <= 0) signsCooldown.axii--;
+    if (signsCooldown.quen > 0 && !quenActive) signsCooldown.quen--;
+    if (signsCooldown.aard > 0) signsCooldown.aard--; // Aard jest natychmiastowy
 
     if (isYrdenActive) monster.yrdenTicks--;
     const monsterIndex = Object.keys(monsterTemplates).indexOf(monster.key) || 0;
     let reactionTime = isYrdenActive ? 4000 : Math.max(800, 1600 - (monsterIndex * 100));
 
-    currentTurnTimer = setTimeout(() => { if (canDodge) { stopDodgeMove(); applyMonsterDamage(); } }, reactionTime);
+    currentTurnTimer = setTimeout(() => {
+        if (typeof tutorialState !== 'undefined' && tutorialState.active && tutorialState.freezeDodge) return;
+        if (canDodge) { stopDodgeMove(); applyMonsterDamage(); }
+    }, reactionTime);
 }
 
 function removeFakes() {
@@ -1585,6 +1577,14 @@ function loadGame() {
     }
 
     updateUI();
+
+    // Inicjalizacja sprawdzania samouczków
+    if (!stats.tutorialsSeen) {
+        stats.tutorialsSeen = { main: false, postBattle: false, shop: false, char: false, training: false, alchemy: false };
+
+        // Pytaj gdy świeża gra lub po prostu gra nie ma rekordu
+        setTimeout(() => promptTutorial(), 600);
+    }
 }
 
 
@@ -2087,34 +2087,76 @@ function addToCauldron(id, invIndex) {
     }
 }
 
+const ALCHEMY_RECIPES = {
+    'Jaskółka': { req: [3, 2], outId: 13, outName: 'Jaskółka', outType: 'potion' }, // Jaskółcze Ziele(3), Ptasie pióra(2) np. (założyłem id 3 i id 2)
+    'Olej na Trupojady': { req: [4, 3, 2], outId: 18, outName: 'Olej na Trupojady', outType: 'oil' },
+    'Samum': { req: [4, 4], outId: 15, outName: 'Samum', outType: 'bomb' },
+    // Aby nie hardkodować ID, możemy bazować na nazwach dla bezpieczeństwa.
+};
+
+const RECIPES_BY_NAMES = [
+    { target: "Jaskółka", seq: ["Jaskółcze Ziele", "Szczawik"], resultId: 13 },
+    { target: "Samum", seq: ["Szczawik", "Szczawik"], resultId: 15 },
+    { target: "Olej na Trupojady", seq: ["Szczawik", "Korzeń Mandragory", "Jaskółcze Ziele"], resultId: 21 }, // Nowy ID na olej wymyślony
+    { target: "Olej na Wampiry", seq: ["Korzeń Mandragory", "Szczawik", "Korzeń Mandragory"], resultId: 22 }
+];
+
 function brewPotion() {
     if (cauldronItems.length < 2) {
         showToast("Wrzuć co najmniej 2 zioła do Kotła!", "gray");
         return;
     }
 
-    // Potęzna fuzja ziół dająca prawdziwe potki i OLEJE!
-    const names = cauldronItems.map(i => i.name).join('');
+    // Jeśli gracz jest w samouczku na etapie alchemii
+    if (tutorialState.active && tutorialState.step === 20) {
+        advanceTutorial();
+    }
+
     const cauld = document.getElementById('cauldron');
     cauld.style.transform = "rotate(360deg)";
 
     setTimeout(() => {
         cauld.style.transform = "none";
-        if (names.includes('Jaskółcze') && cauldronItems.length >= 2) {
-            stats.pot++;
-            addLog("WIEDZA ALCHEMICZNA! Stworzono: 🧪 Jaskółka", "#2ecc71");
-        } else if (names.includes('Szczawik') && cauldronItems.length >= 2) {
-            stats.bomb++;
-            addLog("WIEDZA ALCHEMICZNA! Stworzono: 💣 Samum", "#ff4500");
-        } else if (names.includes('Mandragory')) {
-            // Dodajemy olej wiedźmiński zamiast po prostu + Ataku! Zrobiłem olej na wampiry jako potka, która jednorazowo... dla uproszczenia nadal może dodawać atak po prostu, bo system walki nie obsługuje ekwipunku-buffów zaawansowanych.
-            // Lub stworzymy mu i przypniemy nowy item "Olej".
-            // Dodam mu permanentne zwiększenie ataku jako "Wiedza Wiedźmińska o anatomi wroga".
-            stats.atk += 2;
-            addLog("WIEDZA ALCHEMICZNA! Mutageniczny Olej z Mandragory nałożony na stałe na pancerz: +2 Ataku!", "#d4af37");
+
+        let seqNames = cauldronItems.map(i => i.name);
+
+        // Szukanie przepisu
+        let crafted = null;
+        for (let r of RECIPES_BY_NAMES) {
+            // Sprawdzamy czy odblokowane (założenie: stats.unlockedRecipes to tablica stringów "Jaskółka", etc)
+            // Na razie Jaskółka, Samum są odblokowane bazowo, a oleje od bossów.
+            let isUnlocked = (r.target === "Jaskółka" || r.target === "Samum") || (stats.unlockedRecipes && stats.unlockedRecipes.includes(r.target));
+
+            if (isUnlocked && JSON.stringify(r.seq) === JSON.stringify(seqNames)) {
+                crafted = r;
+                break;
+            }
+        }
+
+        if (crafted) {
+            // Zbudowanie przedmiotu
+            let newItem = shopItems.find(i => i.id === crafted.resultId);
+            if (!newItem) {
+                // Generowanie dynamiczne, jeżeli nie ma w sklepie
+                newItem = { id: crafted.resultId, name: crafted.target, type: 'consumable', sub: (crafted.target.includes('Olej') ? 'oil' : 'potion'), price: 50, desc: `Wytworzone w kotle.`, icon: (crafted.target.includes('Olej') ? '🩸' : '🧪') };
+            }
+            // Zwiększamy statystykę dla kompatybilności wstecz (bomby/potki)
+            if (crafted.target === "Jaskółka") stats.pot++;
+            if (crafted.target === "Samum") stats.bomb++;
+
+            // Dodajemy do inwentarza z nowym UID żeby się nie stackowało głupio jeśli nie trzeba
+            let itemClone = JSON.parse(JSON.stringify(newItem));
+            itemClone.uid = Date.now() + Math.random();
+            inventory.push(itemClone);
+
+            addLog(`UWARZYŁEŚ: ${crafted.target}!`, "#2ecc71");
+            showToast(`Uwarzono: ${crafted.target}`, "#2ecc71");
         } else {
-            stats.maxHp += 5;
-            addLog("Breja... Ale wzmacnia krzepę! +5 Max HP", "gray");
+            // LOSOWA MIESZANKA
+            let garbage = { id: 999, uid: Date.now(), name: "Losowa Mieszanka", type: "trash", price: 1, desc: "Brak ustalonej receptury lub nieznana wiedza. Nic nie warte.", icon: "🗑️" };
+            inventory.push(garbage);
+            addLog(`Porażka! Powstała Losowa Mieszanka.`, "red");
+            showToast("Błędna kombinacja!", "red");
         }
 
         cauldronItems = [];
@@ -2230,16 +2272,346 @@ function upgradeSignsUI() {
     sideMenu.classList.add('active');
 }
 
+// ------------------- TUTORIAL SYSTEM -------------------
+let tutorialState = {
+    active: false,
+    step: 0,
+    bubble: null,
+    overlay: null,
+    text: null,
+    nextBtn: null
+};
 
+const TUTORIAL_STEPS = [
+    {   // Krok 0
+        text: "Witaj w miniaturowym świecie wiedźmina nowicjuszu! Ten samouczek sprawi że nie będziesz już nowicjuszem...",
+        highlight: null,
+        nextBtn: true,
+        action: () => { }
+    },
+    {   // Krok 1
+        text: "Naciśnij przycisk \"Przyjmij zlecenie\" aby stoczyć swój pierwszy pojedynek!",
+        highlight: ".btn-hunt",
+        nextBtn: false,
+        pulseHighlight: true,
+        action: () => {
+            const btn = document.querySelector(".btn-hunt");
+            if (btn) {
+                const oldClick = btn.onclick;
+                btn.onclick = () => {
+                    if (oldClick) oldClick.call(btn);
+                    advanceTutorial();
+                    btn.onclick = oldClick;
+                };
+            }
+        }
+    },
+    {   // Krok 2
+        text: "To jest lista potworów na których będziesz zarabiać, jak widzisz większość jest zablokowana, ale spokojnie odblokujesz je w swoim czasie.",
+        highlight: null,
+        nextBtn: true,
+        action: () => { }
+    },
+    {   // Krok 3
+        text: "Wybierz swojego pierwszego stwora, nie masz dużego wyboru.",
+        highlight: "#monster-board .monster-card:first-child",
+        nextBtn: false,
+        pulseHighlight: false,
+        action: () => {
+            const utopiecCard = document.querySelector("#monster-board .monster-card:first-child");
+            if (utopiecCard) {
+                utopiecCard.classList.add("tutorial-highlight");
+                const oldClick = utopiecCard.onclick;
+                utopiecCard.onclick = () => {
+                    if (oldClick) oldClick.call(utopiecCard);
+                    advanceTutorial();
+                    utopiecCard.onclick = oldClick;
+                }
+            }
+        }
+    },
+    {   // Krok 4
+        text: "Oto jest ekran walki! To serce twojej rozgrywki, zaatakuj przeciwnika.",
+        highlight: "#btn-main-attack",
+        nextBtn: false,
+        pulseHighlight: true,
+        action: () => {
+            const btn = document.getElementById("btn-main-attack");
+            if (btn) {
+                const oldClick = btn.onclick;
+                btn.onclick = () => {
+                    if (oldClick) oldClick.call(btn);
+                    advanceTutorial();
+                    btn.onclick = oldClick;
+                };
+            }
+        }
+    },
+    {   // Krok 5
+        text: "Naciśnij unik aby nie dostać obrażeń! W zwykłej walce zniknąłby po jakimś czasie, więc nie zwlekaj! Teraz dam ci ten czas.",
+        highlight: "#dodgeBtn",
+        nextBtn: false,
+        pulseHighlight: true,
+        action: () => {
+            tutorialState.freezeDodge = true;
+            document.getElementById("tutorial-bubble").style.display = "flex";
+            const btn = document.getElementById("dodgeBtn");
+            if (btn) {
+                const oldMouse = btn.onmousedown;
+                btn.onmousedown = (e) => {
+                    if (oldMouse) oldMouse.call(btn, e);
+                    setTimeout(() => advanceTutorial(), 500);
+                    btn.onmousedown = oldMouse;
+                };
+            }
+        }
+    },
+    {   // Krok 6
+        text: "Super! Pora zapoznać się ze znakami, bardzo się przydają.",
+        highlight: "#btn-battle-signs",
+        nextBtn: false,
+        pulseHighlight: true,
+        action: () => {
+            tutorialState.freezeDodge = false;
+            const btn = document.getElementById("btn-battle-signs");
+            if (btn) {
+                const oldClick = btn.onclick;
+                btn.onclick = () => {
+                    if (oldClick) oldClick.call(btn);
+                    advanceTutorial();
+                    btn.onclick = oldClick;
+                };
+            }
+        }
+    },
+    {   // Krok 7
+        text: "To są twoje znaki, każdy znak regeneruje się po określonej liczbie tur, im jest silniejszy, tym rzadziej możesz go używać.",
+        highlight: "#battleSignsContainer",
+        nextBtn: true,
+        position: 'left',
+        action: () => { }
+    },
+    {   // Krok 8
+        text: "To jest IGNI, podpala przeciwnika zadając mu obrażenia i wzmacnia twój miecz na jakiś czas.",
+        highlight: "#battleSignsContainer button:nth-of-type(1)",
+        nextBtn: true,
+        position: 'left',
+        pulseHighlight: true
+    },
+    {   // Krok 9
+        text: "To jest QUEN, tworzy tarcze pochlaniajaca obrazenia.",
+        highlight: "#battleSignsContainer button:nth-of-type(2)",
+        nextBtn: true,
+        position: 'left',
+        pulseHighlight: true
+    },
+    {   // Krok 10
+        text: "To jest YRDEN, pułapka na bestie, wysoce zwalnia ataki potwora.",
+        highlight: "#battleSignsContainer button:nth-of-type(3)",
+        nextBtn: true,
+        position: 'left',
+        pulseHighlight: true
+    },
+    {   // Krok 11
+        text: "To są twoje przedmioty jak nazwa wskazuje, używaj ich aby pomóc sobie w bitwie.",
+        highlight: "#btn-battle-inv",
+        nextBtn: true,
+        position: 'right',
+        pulseHighlight: true,
+        action: () => {
+            closeSideMenu(); // zamknij menu z znakami
+            document.querySelectorAll(".tutorial-highlight, .tutorial-highlight-pulse").forEach(e => {
+                e.classList.remove('tutorial-highlight');
+                e.classList.remove('tutorial-highlight-pulse');
+            });
+        }
+    },
+    {   // Krok 12
+        text: "I jeszcze jedno, jeżeli zechcesz stchórzyć, kliknij czerwony przycisk. To wszystko, Powodzenia!",
+        highlight: "#exitBattleBtn",
+        nextBtn: true,
+        position: 'right',
+        pulseHighlight: true,
+        action: () => {
+            document.getElementById("btn-battle-inv").classList.remove('tutorial-highlight-pulse');
+            // Zeby przycisk wyjscia faktycznie widac (bo normalnie utopiec nie jest bossem wiec widac)
+            document.getElementById("exitBattleBtn").style.display = "flex";
+        }
+    },
+    {   // Krok 13
+        text: "", // Puste okno znika
+        highlight: null,
+        nextBtn: false,
+        action: () => {
+            hideTutorialUI(); // ukrywamy samouczek by toczyła się normalna walka 
+        }
+    },
+    {   // Krok 14 - pokazywane z finishBattle()
+        text: "To koniec samouczka bitewnego! Reszty gry nauczysz się w czasie rozgrywki, powodzenia na szlaku!",
+        highlight: null,
+        nextBtn: true,
+        action: () => {
+            document.getElementById("tutorial-overlay").style.display = "block";
+            document.getElementById("tutorial-bubble").style.display = "flex";
+        }
+    },
+    {   // Krok 15
+        text: "Zapisuje grę...",
+        highlight: null,
+        nextBtn: true,
+        action: () => {
+            hideTutorialUI();
+            tutorialState.active = false;
+        }
+    }
+];
 
+// Osobne kroki dla zakladek
+const TUTORIAL_AD_HOC = {
+    'shop': [
+        { text: "To jest Bazar w Novigradzie! Spotkasz tu kupców u których wyposażysz się w odpowiednie do walki przedmioty.\nMają one następujące statystyki:\n🛡️ Pancerz - Chroni przed obrażeniami abyś mógł przyjąć więcej uderzeń.\n⚔️ Atak - Zwiększa obrażenia\n👟 Zwinność - Daje ci więcej czasu na reakcję przy unikach\n❤️ Życie - To po prostu twoje życie.", nextBtn: true },
+        { text: "Uważaj!!! Aby skorzystać z przedmiotu musisz założyć go najpierw w ekwipunku.", nextBtn: true, action: hideTutorialUI }
+    ],
+    'char': [
+        { text: "To jest twój ekwipunek, masz tu wszystkie swoje przedmioty, załóż przedmiot aby był aktywny w bitwie.\nMożesz tu również ulepszyć swoje znaki, aby to zrobić musisz z nich skorzystać podczas bitwy określoną ilość razy.", nextBtn: true, action: hideTutorialUI }
+    ],
+    'training': [
+        { text: "To jest Plac Treningowy, tutaj możesz przygotować się do walki z odblokowanymi potworami, bądź ćwiczyć na kukiełce.", nextBtn: true, action: hideTutorialUI }
+    ],
+    'alchemy': [
+        { text: "Tu możesz uwarzyć swoje mikstury do bitwy, aby to zrobić wybierz odpowiednie składniki i uważ miksturę.\nMikstury pojawią się w twoim ekwipunku, będziesz mógł z nich skorzystać podczas bitwy.\nPamiętaj, losowe łączenie przedmiotów jest słabym rozwiązaniem, pokonaj swojego pierwszego Bossa aby odblokować pierwszą Recepturę, będzie to kombinacja ziół potrzebna ci do uwarzenia danej mikstury.", nextBtn: true, action: hideTutorialUI }
+    ]
+};
 
+function initTutorialDOM() {
+    tutorialState.bubble = document.getElementById('tutorial-bubble');
+    tutorialState.overlay = document.getElementById('tutorial-overlay');
+    tutorialState.text = document.getElementById('tutorial-text');
+    tutorialState.nextBtn = document.getElementById('tutorial-next-btn');
+}
 
+function promptTutorial() {
+    openModal("SAMOUCZEK", "Czy chcesz zainicjować sekwencję samouczka dla nowicjuszy?", () => {
+        // TAK
+        initTutorialDOM();
+        tutorialState.active = true;
+        tutorialState.step = 0;
+        showTutorialStep(0);
 
+        let t = stats.tutorialsSeen || {};
+        t.main = true;
+        stats.tutorialsSeen = t;
+    }, () => {
+        // NIE
+        let t = stats.tutorialsSeen || {};
+        // Oznacz wszystkie jako zaliczone
+        t.main = true; t.shop = true; t.char = true; t.training = true; t.alchemy = true; t.postBattle = true;
+        stats.tutorialsSeen = t;
+        saveGame();
+    });
+}
 
+function advanceTutorial() {
+    if (!tutorialState.active) return;
 
+    // Zdejmij obecne podswietlenie
+    const currentStepConfig = TUTORIAL_STEPS[tutorialState.step];
+    if (currentStepConfig && currentStepConfig.highlight) {
+        let el = document.querySelector(currentStepConfig.highlight);
+        if (el) {
+            el.classList.remove('tutorial-highlight');
+            el.classList.remove('tutorial-highlight-pulse');
+        }
+    }
 
+    tutorialState.step++;
+    showTutorialStep(tutorialState.step);
+}
 
+function showTutorialStep(stepIndex) {
+    if (stepIndex >= TUTORIAL_STEPS.length) {
+        hideTutorialUI();
+        return;
+    }
+    const config = TUTORIAL_STEPS[stepIndex];
+    if (!config) return;
 
+    tutorialState.overlay.style.display = "block";
+    tutorialState.bubble.style.display = "flex";
 
+    // Format text
+    tutorialState.text.innerText = config.text;
 
+    // Position
+    if (config.position === 'left') tutorialState.bubble.classList.add('left-side');
+    else tutorialState.bubble.classList.remove('left-side');
 
+    // Next Btn
+    tutorialState.nextBtn.style.display = config.nextBtn ? "block" : "none";
+
+    // Highlight
+    if (config.highlight) {
+        const el = document.querySelector(config.highlight);
+        if (el) {
+            el.classList.add(config.pulseHighlight ? 'tutorial-highlight-pulse' : 'tutorial-highlight');
+        }
+    }
+
+    // Dodaj pointer-events blokujące resztę ekranu
+    document.body.classList.add('tutorial-disable-clicks');
+
+    if (config.action) config.action();
+}
+
+function hideTutorialUI() {
+    if (tutorialState.overlay) tutorialState.overlay.style.display = "none";
+    if (tutorialState.bubble) tutorialState.bubble.style.display = "none";
+    document.body.classList.remove('tutorial-disable-clicks');
+
+    // Zdejmij wszystkie ewentualne pozostalosci podswietlen
+    document.querySelectorAll('.tutorial-highlight, .tutorial-highlight-pulse').forEach(e => {
+        e.classList.remove('tutorial-highlight');
+        e.classList.remove('tutorial-highlight-pulse');
+    });
+}
+
+// Funkcja adhoc dla poszczegolnych okien (punkty 16-21)
+let adHocStep = 0;
+let currentAdHocQueue = [];
+function startAdHocTutorial(tabId) {
+    if (!stats.tutorialsSeen) return;
+    if (stats.tutorialsSeen[tabId]) return;
+    stats.tutorialsSeen[tabId] = true;
+    saveGame();
+
+    currentAdHocQueue = TUTORIAL_AD_HOC[tabId];
+    if (!currentAdHocQueue) return;
+
+    tutorialState.active = true;
+    adHocStep = 0;
+    showAdHocStep();
+}
+
+function showAdHocStep() {
+    if (!tutorialState.overlay) initTutorialDOM();
+    if (adHocStep >= currentAdHocQueue.length) {
+        tutorialState.active = false;
+        hideTutorialUI();
+        return;
+    }
+
+    const conf = currentAdHocQueue[adHocStep];
+    tutorialState.overlay.style.display = "block";
+    tutorialState.bubble.style.display = "flex";
+    tutorialState.text.innerText = conf.text;
+    tutorialState.bubble.classList.remove('left-side');
+
+    tutorialState.nextBtn.style.display = conf.nextBtn ? "block" : "none";
+    tutorialState.nextBtn.onclick = () => {
+        if (conf.action) conf.action();
+        adHocStep++;
+        showAdHocStep();
+    };
+
+    document.body.classList.add('tutorial-disable-clicks');
+}

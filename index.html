@@ -15,6 +15,13 @@
     <!-- Powiadomienia (dodaj tuż pod otwarciem body) -->
     <div id="notification-area" style="position: fixed; top: 20px; right: 20px; z-index: 9999;"></div>
 
+    <!-- Samouczek -->
+    <div id="tutorial-overlay"></div>
+    <div id="tutorial-bubble">
+        <div id="tutorial-text">...</div>
+        <button id="tutorial-next-btn" class="tutorial-bubble-btn" onclick="advanceTutorial()">Dalej</button>
+    </div>
+
     <div class="game-container" id="mainContainer">
         <!-- Pasek statystyk -->
         <div class="top-bar">
@@ -138,7 +145,7 @@
         <!-- Polowanie -->
         <div id="hunt" class="screen" style="display:none;">
             <h3 style="color:var(--accent)">📜 Tablica Ogłoszeń</h3>
-            <div id="monster-board" class="monster-grid">
+            <div id="monster-board" class="monster-grid monster-grid-scrollable">
                 <!-- Karty potworów zostaną wygenerowane przez JS -->
             </div>
             <button onclick="switchTab('menu')" style="width:100%; margin-top:20px;">Anuluj</button>
@@ -200,9 +207,9 @@
 
                 <!-- Główne przyciski akcji -->
                 <div class="controls" id="battleActions">
-                    <button onclick="handleAction('attack')" class="btn-main-attack">⚔️ Szybki Atak</button>
-                    <button onclick="openWitcherPanel('inv')" style="background:#444;">🎒 Przedmioty</button>
-                    <button onclick="openWitcherPanel('signs')" style="background:#2e4a62;">✨ Znaki</button>
+                    <button onclick="handleAction('attack')" id="btn-main-attack" class="btn-main-attack">⚔️ Szybki Atak</button>
+                    <button onclick="openWitcherPanel('inv')" id="btn-battle-inv" style="background:#444;">🎒 Przedmioty</button>
+                    <button onclick="openWitcherPanel('signs')" id="btn-battle-signs" style="background:#2e4a62;">✨ Znaki</button>
                 </div>
 
                 <!-- PRZYWRÓCONY PRZYCISK NAGRODY -->
@@ -346,6 +353,5 @@
  
 <<<<<<< HEAD
  -->
-=======
--->
->>>>>>> 02d90c488402dcaaef44fae429dad82a79130a13
+<!-- =======
+>>>>>>> 02d90c488402dcaaef44fae429dad82a79130a13 -->
