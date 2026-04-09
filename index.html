@@ -153,9 +153,7 @@
                 <div class="slot" id="slot-trinket" onclick="unequip('trinket')">💍 Brak talizmanu</div>
             </div>
 
-            <button onclick="upgradeSignsUI()"
-                style="font-size: 0.7rem; padding: 8px 15px; background: var(--gold); color: black; font-weight: bold; flex: 1">ROZWÓJ
-                ZNAKÓW</button>
+            <button onclick="upgradeSignsUI()" class="sign-upgrade-btn">ROZWÓJ ZNAKÓW</button>
 
 
             <div class="inv-tabs" style="display: flex; gap: 5px; margin-bottom: 15px; flex-wrap: wrap;">
@@ -166,7 +164,7 @@
                 <button onclick="changeInvTab('herb')" id="tab-herb"
                     style="flex:1; padding: 10px; background: #222;">Zioła</button>
             </div>
-            <div id="inv-list" style="display: flex; flex-direction: column; gap: 10px;"></div>
+            <div id="inv-list"></div>
             <button onclick="switchTab('menu')" style="width:100%; margin-top:20px;">Wróć</button>
         </div>
 

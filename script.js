@@ -9,7 +9,7 @@ let currentCombo = 0; // Dla stylu 'combo'
 let hitsNeeded = 1; // Ile razy trzeba kliknąć (dla stylu Combo)
 let isMirageActive = false; // Czy aktualnie trwa Miraż
 let signsCooldown = { igni: 0, quen: 0, yrden: 0, axii: 0, aard: 0 };
-let signsMaxCooldown = { igni: 3, quen: 4, yrden: 10, axii: 4, aard: 5 }; // YRDEN NERF/BUFF: Czas na 10 tur po zakończeniu efektu!
+let signsMaxCooldown = { igni: 5, quen: 4, yrden: 4, axii: 4, aard: 4 }; // YRDEN NERF/BUFF: Czas na 10 tur po zakończeniu efektu!
 let dodgeIntervals = []; // Tablica na wszystkie aktywne interwały
 let currentTurnTimer;
 let selectedSigns = ['igni', 'quen', 'yrden']; // Domyślne 3 znaki
@@ -478,7 +478,7 @@ function changeInvTab(tabName) {
         b.style.fontWeight = 'normal';
     });
     const activeBtn = document.getElementById('tab-' + tabName);
-    if(activeBtn) {
+    if (activeBtn) {
         activeBtn.style.background = 'var(--gold)';
         activeBtn.style.color = 'black';
         activeBtn.style.fontWeight = 'bold';
@@ -518,7 +518,7 @@ function renderInventory() {
         const invIndex = inventory.indexOf(item);
         const isEquipped = Object.values(equipped).includes(item);
         const itemJson = JSON.stringify(item).replace(/"/g, '&quot;');
-        
+
         let customAction = `onclick="openItemPreview(null, false, ${invIndex})"`;
 
         return `
@@ -530,7 +530,7 @@ function renderInventory() {
                  onmouseleave="hideTooltip()">
                 <div class="item-info">
                     <div class="item-type-icon">${item.rarity || 'common'}</div>
-                    <div class="item-name">${item.name} ${isEquipped ? '(ZAŁOŻONO)' : ''} ${item.qty && item.qty > 1 ? 'x'+item.qty : ''}</div>
+                    <div class="item-name">${item.name} ${isEquipped ? '(ZAŁOŻONO)' : ''} ${item.qty && item.qty > 1 ? 'x' + item.qty : ''}</div>
                 </div>
             </div>`;
     }).join('') + `</div>`;
@@ -2343,7 +2343,7 @@ function upgradeSignsUI() {
     const wrapper = document.createElement('div');
     wrapper.className = 'panel-content visible';
     wrapper.innerHTML = `<h4>✨ DRZEWKO ZNAKÓW</h4>
-    <p style="font-size:0.7rem; color:#ccc; margin-bottom:10px;">Z każdym bojowym wyrzuceniem znaku zdobywasz w nim Biegłość (XP). Użyj Biegłości, by wyostrzyć umysł i odmawiać mrok szybciej (niższy Cooldown).</p>`;
+    <p style="font-size:0.7rem; color:#ccc; margin-bottom:10px;">Każde użycie znaku to jeden punkt.</p>`;
 
     Object.keys(signsMaxCooldown).forEach(id => {
         const level = stats.signUpgrades[id];
@@ -2354,14 +2354,14 @@ function upgradeSignsUI() {
         wrapper.innerHTML += `
             <button onclick="tryUpgradeSign('${id}')" style="width:100%; margin-bottom:10px; padding: 10px; background: ${maxed ? '#111' : (xp >= cost ? 'var(--gold)' : '#222')}; color: ${(xp >= cost && !maxed) ? '#000' : '#fff'}; border: 1px solid ${maxed ? '#111' : 'var(--gold)'}; text-align: left;">
                 <div style="font-weight: bold; font-size: 1rem;">${id.toUpperCase()} <span style="font-size:0.7rem;">(Lvl ${level})</span></div>
-                <div style="font-size: 0.75rem;">Odzysk energii po ${signsMaxCooldown[id]} turach.</div>
+                <div style="font-size: 0.75rem;">Ponowne użycie po ${signsMaxCooldown[id]} turach.</div>
                 <div style="margin-top: 5px; font-size:0.7rem; color:${maxed ? 'gray' : (xp >= cost ? '#000' : '#2ecc71')};">
-                    ${maxed ? 'MAKSYMALNA BIEGŁOŚĆ' : `Wymagana Biegłość: ${xp} / ${cost} Użyć`}
+                    ${maxed ? 'MAKSYMALNA ILOŚĆ PUNKTÓW' : `Wymagane punkty: ${xp} / ${cost} Użyć`}
                 </div>
             </button>`;
     });
 
-    wrapper.innerHTML += `<button onclick="closeSideMenu()" class="btn-close" style="width:100%; margin-top:auto;">ZAMKNIJ OŚWIECENIE</button>`;
+    wrapper.innerHTML += `<button onclick="closeSideMenu()" class="btn-close" style="width:100%; margin-top:auto;">ZAMKNIJ</button>`;
     sideMenu.appendChild(wrapper);
     sideMenu.classList.add('active');
 }
