@@ -69,8 +69,7 @@
         </div>
         <div id="alchemy" class="screen" style="display:none;">
             <h3 style="color:#2ecc71; text-shadow: 0 0 10px rgba(46,204,113,0.4);">🌿 Warsztat Alchemiczny</h3>
-            <p style="font-size:0.85rem; color:#ccc; font-style: italic;">Sprostaj chemii natury. Dobieraj składniki i
-                mieszaj eliksiry.</p>
+            <p style="font-size:0.85rem; color:#ccc; font-style: italic;">Umiesz mieszać? To sobie pomieszasz.</p>
 
             <div id="cauldron-slots"
                 style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; border: 1px solid #444; padding: 15px; background: #1a1a1a; border-radius: 8px;">
@@ -88,13 +87,6 @@
                     IV. Pusto</div>
             </div>
 
-            <div class="alchemy-actions" style="display: flex; gap: 10px; margin-bottom: 20px;">
-                <button onclick="brewPotion()" id="btn-brew" class="btn-buy alchemy-brew-btn"
-                    style="flex:2; font-weight: bold;">WARZ MIKSTURĘ</button>
-                <button onclick="emptyCauldron()" class="menu-btn alchemy-empty-btn" style="flex:1;">Wyjmij
-                    składniki</button>
-            </div>
-
             <div class="alchemy-herbs-panel"
                 style="border: 1px solid #333; border-radius: 8px; padding: 10px; background: #111;">
                 <div style="display: flex; gap: 5px; margin-bottom: 10px;">
@@ -109,6 +101,15 @@
                     <!-- Zioła z ekwipunku generowane dynamicznie -->
                 </div>
             </div>
+
+            <div class="alchemy-actions" style="display: flex; gap: 10px; margin-bottom: 20px;">
+                <button onclick="brewPotion()" id="btn-brew" class="btn-buy alchemy-brew-btn"
+                    style="flex:2; font-weight: bold;">WARZ MIKSTURĘ</button>
+                <button onclick="emptyCauldron()" class="menu-btn alchemy-empty-btn" style="flex:1;">Wyjmij
+                    składniki</button>
+            </div>
+
+
 
             <button onclick="switchTab('menu')" style="width:100%; margin-top:20px;">Wróć do Menu</button>
         </div>
@@ -151,12 +152,11 @@
                 <div class="slot" id="slot-armor" onclick="unequip('armor')">🛡️ Brak zbroi</div>
                 <div class="slot" id="slot-trinket" onclick="unequip('trinket')">💍 Brak talizmanu</div>
             </div>
-            <div class="sign-selector"
-                style="margin-bottom: 20px; background: #222; padding: 10px; border-radius: 8px; text-align: center;">
-                <button onclick="upgradeSignsUI()"
-                    style="font-size: 0.7rem; padding: 8px 15px; background: var(--gold); color: black; font-weight: bold;">DRZEWKO
-                    BIEGŁOŚCI ZNAKÓW</button>
-            </div>
+
+            <button onclick="upgradeSignsUI()"
+                style="font-size: 0.7rem; padding: 8px 15px; background: var(--gold); color: black; font-weight: bold; flex: 1">ROZWÓJ
+                ZNAKÓW</button>
+
 
             <div class="inv-tabs" style="display: flex; gap: 5px; margin-bottom: 15px; flex-wrap: wrap;">
                 <button onclick="changeInvTab('equipment')" id="tab-equipment"
@@ -165,7 +165,7 @@
                     style="flex:1; padding: 10px; background: #222;">Użytkowe</button>
                 <button onclick="changeInvTab('herb')" id="tab-herb"
                     style="flex:1; padding: 10px; background: #222;">Zioła</button>
-                </div>
+            </div>
             <div id="inv-list" style="display: flex; flex-direction: column; gap: 10px;"></div>
             <button onclick="switchTab('menu')" style="width:100%; margin-top:20px;">Wróć</button>
         </div>

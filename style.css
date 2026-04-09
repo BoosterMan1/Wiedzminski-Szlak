@@ -213,6 +213,7 @@ body {
 .screen {
     padding: 20px;
     text-align: center;
+    justify-content: center;
 }
 
 
@@ -635,7 +636,7 @@ button:hover {
 
 #shop-list,
 #inv-list {
-    height: 400px;
+    height: 600px;
     overflow-y: auto;
     padding: 10px;
     border: 1px solid #444;
@@ -1811,8 +1812,9 @@ button:hover {
     border: 2px solid #8e6d13;
     border-radius: 12px;
     padding: 20px;
-    margin-bottom: 25px;
+    margin-bottom: 7px;
     box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.8);
+
 }
 
 .alchemy-grid {
@@ -1820,6 +1822,8 @@ button:hover {
     gap: 15px;
     flex-wrap: wrap;
     justify-content: center;
+    overflow: auto;
+    height: 110px;
 }
 
 .alchemy-actions {
@@ -1934,7 +1938,7 @@ h3 {
     grid-template-columns: 1fr 1fr;
     grid-template-rows: 1fr 1fr;
     gap: 20px;
-    max-width: 400px;
+    max-width: 300px;
     margin: 30px auto;
     background: transparent !important;
     border: none !important;
@@ -2012,7 +2016,8 @@ body {
     max-height: 100vh !important;
     margin: 0 !important;
     padding: 0 !important;
-    overflow: hidden !important; /* Blokuje przewijanie całej strony */
+    overflow: hidden !important;
+    /* Blokuje przewijanie całej strony */
     display: flex !important;
     justify-content: center !important;
     align-items: center !important;
@@ -2023,12 +2028,15 @@ body {
     height: 100vh !important;
     max-height: 100vh !important;
     width: 100% !important;
-    max-width: 650px !important; /* Utrzymuje proporcje telefonu/pionowe */
-    overflow-y: auto !important; /* Przewijanie wnętrza gry, a nie całej przeglądarki */
+    max-width: 650px !important;
+    /* Utrzymuje proporcje telefonu/pionowe */
+    overflow-y: auto !important;
+    /* Przewijanie wnętrza gry, a nie całej przeglądarki */
     overflow-x: hidden !important;
     display: flex !important;
     flex-direction: column !important;
-    border-radius: 0 !important; /* zeby pasowalo do ekranu, albo mozna zostawic zaokraglenia jesli jest lekki padding, ale przy height 100vh lepiej 0 */
+    border-radius: 0 !important;
+    /* zeby pasowalo do ekranu, albo mozna zostawic zaokraglenia jesli jest lekki padding, ale przy height 100vh lepiej 0 */
 }
 
 @media (min-height: 800px) {
@@ -2041,5 +2049,6 @@ body {
 
 .screen {
     flex-grow: 1 !important;
-    overflow-y: visible !important; /* Zawartość strony samej w sobie wylewa się na .game-container */
+    overflow-y: visible !important;
+    /* Zawartość strony samej w sobie wylewa się na .game-container */
 }
