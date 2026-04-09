@@ -207,17 +207,34 @@ const shopItems = [
     { id: 48, name: "Eliksir Oczyszczenia", price: 20000, type: 'consumable', sub: 'reset', rarity: 'epic', desc: "🌀 Pozwala zresetować statystyki." },
 
     // --- ZIOŁA ---
-    { id: 101, name: "Jaskółcze Ziele", price: 10, type: 'consumable', sub: 'herb', rarity: 'common', desc: "Podstawowe zioło lecznicze." },
-    { id: 102, name: "Szczawik", price: 25, type: 'consumable', sub: 'herb', rarity: 'common', desc: "Kwaśne zioło toksyczne." },
-    { id: 103, name: "Korzeń Mandragory", price: 120, type: 'consumable', sub: 'herb', rarity: 'rare', desc: "Silny katalizator magiczny." },
+    { id: 101, name: "Jaskółcze ziele", price: 15, type: 'consumable', sub: 'herb', rarity: 'common', desc: "Podstawowe zioło." },
+    { id: 102, name: "Arenaria", price: 18, type: 'consumable', sub: 'herb', rarity: 'common', desc: "Biały kwiat rosnący na równinach." },
+    { id: 103, name: "Blekot", price: 20, type: 'consumable', sub: 'herb', rarity: 'common', desc: "Roślina o ciemnych liściach." },
+    { id: 104, name: "Szytna", price: 25, type: 'consumable', sub: 'herb', rarity: 'common', desc: "Kłujący krzew." },
+    { id: 105, name: "Wilczy aloes", price: 30, type: 'consumable', sub: 'herb', rarity: 'rare', desc: "Rzadka, zimowa odmiana aloesu." },
+    { id: 106, name: "Ginatia", price: 35, type: 'consumable', sub: 'herb', rarity: 'rare', desc: "Płatki wykorzystywane w delikatnych eliksirach." },
+    { id: 107, name: "Krew ghula", price: 80, type: 'consumable', sub: 'herb', rarity: 'epic', desc: "Składnik monstrualny. Cuchnie padliną." },
+    { id: 108, name: "Płatki białego mirtu", price: 40, type: 'consumable', sub: 'herb', rarity: 'rare', desc: "Kwiaty o odurzającym zapachu." },
+    { id: 109, name: "Korzeń mandragory", price: 100, type: 'consumable', sub: 'herb', rarity: 'epic', desc: "Niezwykle potężny katalizator." },
+    { id: 110, name: "Siarka", price: 50, type: 'consumable', sub: 'herb', rarity: 'rare', desc: "Alchemiczny minerał o ostrym zapachu." },
+    { id: 111, name: "Saletra", price: 45, type: 'consumable', sub: 'herb', rarity: 'rare', desc: "Proszek niezbędny do petard i eliksirów." },
+    { id: 112, name: "Jad wiwerny", price: 150, type: 'consumable', sub: 'herb', rarity: 'legendary', desc: "Składnik monstrualny. Wysoce toksyczny." },
+    { id: 113, name: "Wątroba wilkołaka", price: 180, type: 'consumable', sub: 'herb', rarity: 'legendary', desc: "Składnik monstrualny. Nasycona klątwą." },
+    { id: 114, name: "Mózg utopca", price: 60, type: 'consumable', sub: 'herb', rarity: 'rare', desc: "Składnik monstrualny. Pokryty mułem." },
+    { id: 115, name: "Oczy nekkera", price: 70, type: 'consumable', sub: 'herb', rarity: 'epic', desc: "Składnik monstrualny. Widzą w ciemności." },
+    { id: 116, name: "Kordel", price: 15, type: 'consumable', sub: 'herb', rarity: 'common', desc: "Pospolita, twarda roślina." },
+    { id: 117, name: "Werbena", price: 20, type: 'consumable', sub: 'herb', rarity: 'common', desc: "Zioło o fioletowych kwiatach." },
+    { id: 118, name: "Szyszka chmielu", price: 10, type: 'consumable', sub: 'herb', rarity: 'common', desc: "Zwykle używana do piwa, też do alchemii." },
+    { id: 119, name: "Ząb jadowy kikimory", price: 90, type: 'consumable', sub: 'herb', rarity: 'epic', desc: "Składnik monstrualny. Ostry jak brzytwa." },
+    { id: 120, name: "Pustyrnik", price: 40, type: 'consumable', sub: 'herb', rarity: 'rare', desc: "Ziele używane do medytacji." },
 
-    // --- OLEJE (Natychmiastowe nałożenie przy kupnie / warzeniu) ---
+    // --- OLEJE ---
     { id: 301, name: "Olej na Trupojady", price: 80, type: 'consumable', sub: 'oil', rarity: 'common', desc: "🗡️ +50% ATK przeciwko Trupojadom w najbliższej bitwie.", targetClass: 'Trupojad' },
     { id: 302, name: "Olej na Wampiry", price: 150, type: 'consumable', sub: 'oil', rarity: 'rare', desc: "🗡️ +50% ATK przeciw krwiopijcom w najbliższej bitwie.", targetClass: 'Wampir' },
     { id: 303, name: "Olej na Drakonidy", price: 150, type: 'consumable', sub: 'oil', rarity: 'rare', desc: "🗡️ +50% ATK przeciw bestiom z nieba w najbliższej bitwie.", targetClass: 'Drakonid' },
     { id: 304, name: "Olej na Relikty", price: 300, type: 'consumable', sub: 'oil', rarity: 'epic', desc: "🗡️ +50% ATK przeciw potężnym, wiecznym bestiom w najbliższej bitwie.", targetClass: 'Relikt' },
 
-    // --- TALIZMANY (Mieszane bonusy) ---
+    // --- TALIZMANY ---
     { id: 18, name: "Ząb Utopca", price: 400, atk: 8, type: 'trinket', rarity: 'common', desc: "Szczęście neofity." },
     { id: 19, name: "Medalion Wilka", price: 2500, maxHp: 300, type: 'trinket', rarity: 'rare', desc: "Wibruje w walce." },
     { id: 20, name: "Pierścień Kota", price: 5500, agi: 25, type: 'trinket', rarity: 'rare', desc: "Kocie ruchy (+25 Agi)." },
@@ -228,6 +245,7 @@ const shopItems = [
     { id: 53, name: "Oko Proroka", price: 300000, agi: 120, atk: 2000, type: 'trinket', rarity: 'legendary', desc: "Widzisz przyszłość." },
     { id: 55, name: "Medalion Gauntera", price: 1000000, atk: 8000, agi: 200, type: 'trinket', rarity: 'legendary', desc: "Pakt podpisany krwią." }
 ];
+;
 
 
 
@@ -407,7 +425,7 @@ function renderShop(merchantType = 'blacksmith') {
     if (merchantType === 'blacksmith') {
         filtered = shopItems.filter(i => i.type === 'weapon' || i.type === 'armor');
     } else if (merchantType === 'herbalist') {
-        filtered = shopItems.filter(i => i.type === 'consumable' && (i.sub === 'herb' || i.sub === 'pot' || i.sub === 'pot_full' || i.sub === 'oil'));
+        filtered = shopItems.filter(i => i.type === 'consumable' && i.sub === 'herb');
     } else if (merchantType === 'merchant') {
         filtered = shopItems.filter(i => i.type === 'trinket' || (i.type === 'consumable' && i.sub !== 'herb' && i.sub !== 'pot' && i.sub !== 'pot_full' && i.sub !== 'oil'));
     } else {
@@ -561,7 +579,9 @@ function buyItem(id) {
         }
         else if (item.sub === 'atk_perm') stats.atk += 5;
         else if (item.sub === 'arm_perm') stats.arm += 5;
-        // Dodaj tutaj inne efekty sub jeśli potrzebujesz
+        else if (item.sub === 'herb') {
+            inventory.push({ ...item, uid: Date.now() + Math.random() });
+        }
     }
     else {
         // Przedmioty trwałe trafiają do juków
@@ -713,6 +733,7 @@ function startBattle(monsterKey, forcedHp = null) {
 function finishBattle() {
     stopDodgeMove();
     signsCooldown = { igni: 0, quen: 0, yrden: 0, axii: 0, aard: 0 };
+    stats.activeOil = null; // Zresetuj olej po walce
 
     // 1. PANCERNY RESET SZALU: Usuwamy klasę wizualną z paska HP potwora
     const mHpBarContainer = document.getElementById('mHpBar').parentElement;
@@ -893,6 +914,14 @@ function handleAction(type) {
         playerTurnActive = false;
         document.getElementById('battleActions').style.opacity = "0.5";
 
+        function applyOilBuff(oilName, monsterClass) {
+    if (!oilName) return 1.0;
+    if (oilName === monsterClass) {
+        return 1.5;
+    }
+    return 1.0;
+}
+
         // --- PANCERNY BALANS DMG (Zasada 10% Przebicia) ---
         // Obliczamy surowe obrażenia (Atak - Pancerz wroga)
         let rawDmg = dmg - monster.arm;
@@ -907,9 +936,10 @@ function handleAction(type) {
             msg += " (Płonące ostrze!)";
         }
 
-        // 3. OLEJ (Kluczowa klasyfikacyjna przewaga)
-        if (stats.activeOil === monster.classDesc) {
-            finalDmg = Math.floor(finalDmg * 1.5);
+        // 3. OLEJ (Kluczowa klasyfikacyjna przewaga przez funkcję)
+        let oilMultiplier = applyOilBuff(stats.activeOil, monster.classDesc);
+        if (oilMultiplier > 1.0) {
+            finalDmg = Math.floor(finalDmg * oilMultiplier);
             msg += " (Zabójczy Olej!)";
         }
 
@@ -1314,23 +1344,23 @@ function useItemFromBattle(id) {
         }
         // Przykład: Dekokt Raffarda (id 46) - Pełne leczenie
         else if (item.sub === 'pot_full') {
-            stats.hp = stats.maxHp;
-            addLog(`Użyto: ${item.name}. Pełna regeneracja!`, "#4caf50");
-        }
-
-        // 3. ZUŻYCIE PRZEDMIOTU
-        inventory.splice(itemIndex, 1); // Usuwamy jedną sztukę z tablicy
-
-        // 4. PANCERNE ODŚWIEŻENIE
-        updateUI();      // Aktualizuje paski HP i cyfry na górze
-        saveGame();      // Zapisuje, żeby gracz nie "oszukał" odświeżeniem strony
-        openWitcherPanel('inv'); // PRZEBUDOWUJE MENU: ilość spadnie (np. z 2 na 1) lub przycisk zniknie
-
-        // Efekt wizualny leczenia jeśli to był eliksir zdrowia
-        if (item.sub === 'pot_full') {
             const container = document.getElementById('mainContainer');
             container.classList.add('heal-effect');
             setTimeout(() => container.classList.remove('heal-effect'), 600);
+        }
+        
+        // --- LOSOWY WYWAR ---
+        if (item.sub === 'random_pot') {
+            if (Math.random() > 0.5) {
+                let heal = Math.floor(stats.maxHp * 0.25);
+                stats.hp = Math.min(stats.maxHp, stats.hp + heal);
+                addLog(`Wypiłeś ${item.name}. Regeneracja! (+${heal} HP)`, "#2ecc71");
+            } else {
+                let dmg = Math.floor(stats.maxHp * 0.15);
+                stats.hp -= dmg;
+                addLog(`Wypiłeś ${item.name}. Trucizna! (-${dmg} HP)`, "red");
+                if (stats.hp <= 0) stats.hp = 1; 
+            }
         }
     }
 }
@@ -1612,6 +1642,11 @@ function setDifficulty(name, mult) {
     document.getElementById('difficulty-modal').style.display = 'none';
     showToast(`Oto Twój szlak: ${name}`, "var(--gold)");
     saveGame();
+
+    // Jeśli świeża gra
+    if (!stats.tutorialsSeen || !stats.tutorialsSeen.main) {
+        setTimeout(() => promptTutorial(), 600);
+    }
 }
 
 function openSaveMenu() { document.getElementById('save-modal').style.display = 'flex'; }
@@ -1671,6 +1706,7 @@ function resetGame() {
 
     showToast("Zresetowano postęp. Szlak zaczyna się od nowa.", "#8e2727");
     switchTab('menu');
+    document.getElementById('difficulty-modal').style.display = 'flex';
 }
 
 
@@ -2054,31 +2090,72 @@ function startMonsterSimulation(monsterKey) {
     addLog(`SYMULACJA: ${m.name}. Klasa: ${m.classDesc || 'Brak'}`, "var(--gold)");
 }
 
+
 // ------------------- ALCHEMIA SYSTEM -------------------
 let cauldronItems = [];
+let currentAlchemyTab = 'herbs'; // 'herbs' lub 'recipes'
+
+function renderAlchemyTab(tabName) {
+    currentAlchemyTab = tabName;
+    document.getElementById('alchemy-tab-herbs').style.background = tabName === 'herbs' ? 'var(--gold)' : '#222';
+    document.getElementById('alchemy-tab-herbs').style.color = tabName === 'herbs' ? 'black' : '#fff';
+    document.getElementById('alchemy-tab-recipes').style.background = tabName === 'recipes' ? 'var(--gold)' : '#222';
+    document.getElementById('alchemy-tab-recipes').style.color = tabName === 'recipes' ? 'black' : '#fff';
+    renderAlchemy();
+}
 
 function renderAlchemy() {
     const list = document.getElementById('herbs-list');
     if (!list) return;
 
-    let herbs = inventory.filter(i => i.sub === 'herb');
-    if (herbs.length === 0) {
-        list.innerHTML = "<div style='color:gray;'>Brak ziół w ekwipunku... Kup coś u Zielarki na Bazarze.</div>";
-    } else {
-        list.innerHTML = herbs.map((item, index) => {
-            return `<button class="menu-btn" onclick="addToCauldron('${item.id}', ${index})" style="font-size:0.7rem; padding: 5px; flex: 1 1 30%; max-width: 30%;">+ ${item.name}</button>`;
-        }).join('');
+    // Renderowanie slotów kotła
+    for (let i = 1; i <= 4; i++) {
+        let slotEl = document.getElementById(`alchemy-slot-${i}`);
+        if (!slotEl) continue;
+        let rom = i === 1 ? 'I.' : i === 2 ? 'II.' : i === 3 ? 'III.' : 'IV.';
+        if (cauldronItems[i - 1]) {
+            slotEl.innerHTML = `<span style="color:var(--gold);">${rom} ${cauldronItems[i - 1].name}</span>`;
+            slotEl.style.borderColor = "var(--gold)";
+        } else {
+            slotEl.innerHTML = `${rom} Pusto`;
+            slotEl.style.borderColor = "#555";
+            slotEl.style.color = "#888";
+        }
     }
-    document.getElementById('cauldron-count').innerText = cauldronItems.length;
+
+    // Renderowanie zawartości dolnej tablicy
+    if (currentAlchemyTab === 'herbs') {
+        let herbs = inventory.filter(i => i.sub === 'herb');
+        if (herbs.length === 0) {
+            list.innerHTML = "<div style='color:gray; width:100%; text-align:center;'>Brak ziół w ekwipunku... Kup coś u Zielarki.</div>";
+        } else {
+            list.innerHTML = herbs.map((item, index) => {
+                const globalIndex = inventory.indexOf(item);
+                return `<button class="menu-btn" onclick="addToCauldron('${item.id}', ${globalIndex})" style="font-size:0.7rem; padding: 5px; flex: 1 1 30%; max-width: 30%;">+ ${item.name}</button>`;
+            }).join('');
+        }
+    } else {
+        // Obliczamy limit receptur - co 2 odkryte potwory
+        let limit = Math.floor((stats.maxUnlockedIndex || 0) / 2);
+        let allowedRecipes = RECIPES_BY_NAMES.filter(r => r.unlockIndex <= limit);
+
+        if (allowedRecipes.length === 0) {
+            list.innerHTML = "<div style='color:gray; width:100%; text-align:center;'>Nie poznałeś jeszcze żadnych receptur. Poluj dalej!</div>";
+        } else {
+            list.innerHTML = allowedRecipes.map(r => {
+                return `<div style="width: 100%; background: #333; padding: 5px; margin-bottom: 5px; font-size: 0.75rem; border-left: 3px solid var(--gold);">
+                    <strong style="color: var(--gold);">${r.target}</strong>: ${r.seq.join(' + ')}
+                </div>`;
+            }).join('');
+        }
+    }
 }
 
 function addToCauldron(id, invIndex) {
-    if (cauldronItems.length >= 3) {
-        showToast("Kocioł jest pełny! (Max 3 składniki)", "red");
+    if (cauldronItems.length >= 4) {
+        showToast("Kocioł jest pełny! (Max 4 składniki)", "red");
         return;
     }
-    // Pobieramy prawdziwy index z pośród wszystkich ziół, ale musimy go znaleźć w całym ekwipunku
-    // Z uwagi na filter, lepiej szukać po bezpośrednio znalezieniu 1 wystąpienia.
     const realIndex = inventory.findIndex(i => i.id == id);
     if (realIndex !== -1) {
         cauldronItems.push(inventory[realIndex]);
@@ -2087,18 +2164,16 @@ function addToCauldron(id, invIndex) {
     }
 }
 
-const ALCHEMY_RECIPES = {
-    'Jaskółka': { req: [3, 2], outId: 13, outName: 'Jaskółka', outType: 'potion' }, // Jaskółcze Ziele(3), Ptasie pióra(2) np. (założyłem id 3 i id 2)
-    'Olej na Trupojady': { req: [4, 3, 2], outId: 18, outName: 'Olej na Trupojady', outType: 'oil' },
-    'Samum': { req: [4, 4], outId: 15, outName: 'Samum', outType: 'bomb' },
-    // Aby nie hardkodować ID, możemy bazować na nazwach dla bezpieczeństwa.
-};
-
+// Baza receptur – unlockIndex oznacza wymagane maxUnlockedIndex potwora / 2.
 const RECIPES_BY_NAMES = [
-    { target: "Jaskółka", seq: ["Jaskółcze Ziele", "Szczawik"], resultId: 13 },
-    { target: "Samum", seq: ["Szczawik", "Szczawik"], resultId: 15 },
-    { target: "Olej na Trupojady", seq: ["Szczawik", "Korzeń Mandragory", "Jaskółcze Ziele"], resultId: 21 }, // Nowy ID na olej wymyślony
-    { target: "Olej na Wampiry", seq: ["Korzeń Mandragory", "Szczawik", "Korzeń Mandragory"], resultId: 22 }
+    { target: "Jaskółka", seq: ["Jaskółcze ziele", "Arenaria", "Kordel"], resultId: 13, unlockIndex: 0 },
+    { target: "Samum", seq: ["Saletra", "Siarka", "Szyszka chmielu"], resultId: 15, unlockIndex: 0 },
+    { target: "Olej na Trupojady", seq: ["Blekot", "Krew ghula", "Mózg utopca"], resultId: 301, unlockIndex: 1 },
+    { target: "Olej na Wampiry", seq: ["Korzeń mandragory", "Płatki białego mirtu", "Ginatia"], resultId: 302, unlockIndex: 2 },
+    { target: "Olej na Drakonidy", seq: ["Jad wiwerny", "Werbena", "Saletra"], resultId: 303, unlockIndex: 3 },
+    { target: "Olej na Relikty", seq: ["Wątroba wilkołaka", "Wilczy aloes", "Ząb jadowy kikimory"], resultId: 304, unlockIndex: 4 },
+    { target: "Dekokt Raffarda Białego", seq: ["Jaskółcze ziele", "Korzeń mandragory", "Oczy nekkera", "Pustyrnik"], resultId: 46, unlockIndex: 5 },
+    { target: "Grom", seq: ["Arenaria", "Krew ghula", "Werbena", "Szytna"], resultId: 17, unlockIndex: 5 }
 ];
 
 function brewPotion() {
@@ -2107,44 +2182,44 @@ function brewPotion() {
         return;
     }
 
-    // Jeśli gracz jest w samouczku na etapie alchemii
     if (tutorialState.active && tutorialState.step === 20) {
         advanceTutorial();
     }
 
-    const cauld = document.getElementById('cauldron');
-    cauld.style.transform = "rotate(360deg)";
+    let btn = document.getElementById('btn-brew');
+    let oldBtnText = btn.innerText;
+    btn.innerText = "🔥 WARZENIE... 🔥";
+    document.querySelectorAll('.alchemy-slot').forEach(s => s.style.backgroundColor = 'rgba(46,204,113,0.3)');
 
     setTimeout(() => {
-        cauld.style.transform = "none";
+        btn.innerText = oldBtnText;
+        document.querySelectorAll('.alchemy-slot').forEach(s => s.style.backgroundColor = 'transparent');
 
-        let seqNames = cauldronItems.map(i => i.name);
+        let seqNames = cauldronItems.map(i => i.name).sort().join(','); 
 
-        // Szukanie przepisu
         let crafted = null;
         for (let r of RECIPES_BY_NAMES) {
-            // Sprawdzamy czy odblokowane (założenie: stats.unlockedRecipes to tablica stringów "Jaskółka", etc)
-            // Na razie Jaskółka, Samum są odblokowane bazowo, a oleje od bossów.
-            let isUnlocked = (r.target === "Jaskółka" || r.target === "Samum") || (stats.unlockedRecipes && stats.unlockedRecipes.includes(r.target));
-
-            if (isUnlocked && JSON.stringify(r.seq) === JSON.stringify(seqNames)) {
-                crafted = r;
-                break;
+            let limit = Math.floor((stats.maxUnlockedIndex || 0) / 2);
+            let isUnlocked = (r.unlockIndex <= limit);
+            if (r.seq.slice().sort().join(',') === seqNames) {
+                if(isUnlocked) {
+                    crafted = r;
+                    break;
+                } else {
+                    crafted = r; 
+                    break;
+                }
             }
         }
 
         if (crafted) {
-            // Zbudowanie przedmiotu
             let newItem = shopItems.find(i => i.id === crafted.resultId);
             if (!newItem) {
-                // Generowanie dynamiczne, jeżeli nie ma w sklepie
-                newItem = { id: crafted.resultId, name: crafted.target, type: 'consumable', sub: (crafted.target.includes('Olej') ? 'oil' : 'potion'), price: 50, desc: `Wytworzone w kotle.`, icon: (crafted.target.includes('Olej') ? '🩸' : '🧪') };
+                newItem = { id: 900+Math.floor(Math.random()*100), name: crafted.target, type: 'consumable', sub: (crafted.target.includes('Olej') ? 'oil' : 'potion'), price: 50, desc: `Wytworzone samodzielnie w kotle.` };
             }
-            // Zwiększamy statystykę dla kompatybilności wstecz (bomby/potki)
-            if (crafted.target === "Jaskółka") stats.pot++;
-            if (crafted.target === "Samum") stats.bomb++;
+            if (crafted.target === "Jaskółka" || newItem.sub === 'potion') stats.pot++;
+            if (crafted.target === "Samum" || newItem.sub === 'bomb') stats.bomb++;
 
-            // Dodajemy do inwentarza z nowym UID żeby się nie stackowało głupio jeśli nie trzeba
             let itemClone = JSON.parse(JSON.stringify(newItem));
             itemClone.uid = Date.now() + Math.random();
             inventory.push(itemClone);
@@ -2152,18 +2227,18 @@ function brewPotion() {
             addLog(`UWARZYŁEŚ: ${crafted.target}!`, "#2ecc71");
             showToast(`Uwarzono: ${crafted.target}`, "#2ecc71");
         } else {
-            // LOSOWA MIESZANKA
-            let garbage = { id: 999, uid: Date.now(), name: "Losowa Mieszanka", type: "trash", price: 1, desc: "Brak ustalonej receptury lub nieznana wiedza. Nic nie warte.", icon: "🗑️" };
+            // LOSOWY WYWAR!
+            let garbage = { id: 999, uid: Date.now(), name: "Losowy Wywar", type: "consumable", sub: "random_pot", price: 1, desc: "Nieznana mieszanka. Pijesz na własne ryzyko.", icon: "🗑️" };
             inventory.push(garbage);
-            addLog(`Porażka! Powstała Losowa Mieszanka.`, "red");
-            showToast("Błędna kombinacja!", "red");
+            addLog(`Porażka! Kocioł wypluł dym i osad. Otrzymujesz Losowy Wywar.`, "red");
+            showToast("Otrzymano: Losowy Wywar!", "red");
         }
 
         cauldronItems = [];
         renderAlchemy();
         updateUI();
         saveGame();
-    }, 400);
+    }, 800);
 }
 
 function emptyCauldron() {
@@ -2348,13 +2423,13 @@ const TUTORIAL_STEPS = [
         }
     },
     {   // Krok 5
-        text: "Naciśnij unik aby nie dostać obrażeń! W zwykłej walce zniknąłby po jakimś czasie, więc nie zwlekaj! Teraz dam ci ten czas.",
+        text: "Kiedy potwór cię zaatakuje, będziesz mógł zrobić unik by zachować zdrowie. Naciskaj kiedy tylko się pojawi! (Zmniejszam ci wymóg czasu reakcji)",
         highlight: "#dodgeBtn",
         nextBtn: false,
         pulseHighlight: true,
+        hideOverlay: true,
         action: () => {
             tutorialState.freezeDodge = true;
-            document.getElementById("tutorial-bubble").style.display = "flex";
             const btn = document.getElementById("dodgeBtn");
             if (btn) {
                 const oldMouse = btn.onmousedown;
@@ -2367,10 +2442,11 @@ const TUTORIAL_STEPS = [
         }
     },
     {   // Krok 6
-        text: "Super! Pora zapoznać się ze znakami, bardzo się przydają.",
+        text: "Super! Pora zapoznać się ze znakami, bardzo się przydają. Naciśnij okrągły przycisk znaków.",
         highlight: "#btn-battle-signs",
         nextBtn: false,
         pulseHighlight: true,
+        hideOverlay: true,
         action: () => {
             tutorialState.freezeDodge = false;
             const btn = document.getElementById("btn-battle-signs");
@@ -2385,45 +2461,94 @@ const TUTORIAL_STEPS = [
         }
     },
     {   // Krok 7
-        text: "To są twoje znaki, każdy znak regeneruje się po określonej liczbie tur, im jest silniejszy, tym rzadziej możesz go używać.",
-        highlight: "#battleSignsContainer",
+        text: "To są twoje znaki. Każdy znak odnawia się co określoną turę. Przeczytaj uważnie opisy by wiedzieć w czym Ci pomogą.",
+        highlight: "#sideMenuContainer",
         nextBtn: true,
         position: 'left',
-        action: () => { }
+        hideOverlay: true,
+        action: () => {
+            // Blokujemy klikalność znaków
+            document.querySelectorAll("#sideMenuContainer button").forEach(btn => {
+                btn.classList.add('tutorial-disable-clicks');
+            });
+        }
     },
     {   // Krok 8
-        text: "To jest IGNI, podpala przeciwnika zadając mu obrażenia i wzmacnia twój miecz na jakiś czas.",
-        highlight: "#battleSignsContainer button:nth-of-type(1)",
-        nextBtn: true,
+        text: "Wypróbuj teraz magię na potworze! Wybierz dowolny znak.",
+        highlight: "#sideMenuContainer",
+        nextBtn: false,
         position: 'left',
-        pulseHighlight: true
+        pulseHighlight: true,
+        hideOverlay: true,
+        action: () => {
+            // Odbanuj przyciski i dodaj przejęcie akcji
+            document.querySelectorAll("#sideMenuContainer button").forEach(btn => {
+                btn.classList.remove('tutorial-disable-clicks');
+                btn.classList.add('tutorial-highlight');
+                btn.style.pointerEvents = "auto";
+
+                const oldClick = btn.onclick;
+                btn.onclick = (e) => {
+                    if (oldClick) oldClick.call(btn, e);
+                    advanceTutorial();
+                };
+            });
+        }
     },
     {   // Krok 9
-        text: "To jest QUEN, tworzy tarcze pochlaniajaca obrazenia.",
-        highlight: "#battleSignsContainer button:nth-of-type(2)",
-        nextBtn: true,
-        position: 'left',
-        pulseHighlight: true
+        text: "Zrób unik!",
+        highlight: "#dodgeBtn",
+        nextBtn: false,
+        pulseHighlight: true,
+        hideOverlay: true,
+        action: () => {
+            tutorialState.freezeDodge = true;
+            document.getElementById("tutorial-bubble").style.display = "flex";
+            const btn = document.getElementById("dodgeBtn");
+            if (btn) {
+                const oldMouse = btn.onmousedown;
+                btn.onmousedown = (e) => {
+                    if (oldMouse) oldMouse.call(btn, e);
+                    setTimeout(() => advanceTutorial(), 500);
+                    btn.onmousedown = oldMouse;
+                };
+            }
+        }
     },
     {   // Krok 10
-        text: "To jest YRDEN, pułapka na bestie, wysoce zwalnia ataki potwora.",
-        highlight: "#battleSignsContainer button:nth-of-type(3)",
-        nextBtn: true,
-        position: 'left',
-        pulseHighlight: true
+        text: "Dobrze. Teraz otwórz ekwipunek, masz tu rzeczy które zakupiłeś na bazarze. Na razie nic tu nie ma.",
+        highlight: "#btn-battle-inv",
+        nextBtn: false,
+        position: 'right',
+        pulseHighlight: true,
+        hideOverlay: true,
+        action: () => {
+            tutorialState.freezeDodge = false;
+            const btn = document.getElementById("btn-battle-inv");
+            if (btn) {
+                const oldClick = btn.onclick;
+                btn.onclick = () => {
+                    if (oldClick) oldClick.call(btn);
+                    advanceTutorial();
+                    btn.onclick = oldClick;
+                }
+            }
+        }
+    },
+    {
+        // tu wstaw brakujący krok
+
     },
     {   // Krok 11
-        text: "To są twoje przedmioty jak nazwa wskazuje, używaj ich aby pomóc sobie w bitwie.",
-        highlight: "#btn-battle-inv",
+        text: "To tyle z nauki. Ten mroczny i tajemniczy pas to twój inwentarz walki.",
+        highlight: "#sideMenuContainer",
         nextBtn: true,
         position: 'right',
         pulseHighlight: true,
+        hideOverlay: true,
         action: () => {
-            closeSideMenu(); // zamknij menu z znakami
-            document.querySelectorAll(".tutorial-highlight, .tutorial-highlight-pulse").forEach(e => {
-                e.classList.remove('tutorial-highlight');
-                e.classList.remove('tutorial-highlight-pulse');
-            });
+            // Zamknięcie okna itp dla porządku upewniamy że klikanie wyłączone tymczasowo
+            document.querySelectorAll("#sideMenuContainer button").forEach(btn => btn.classList.add('tutorial-disable-clicks'));
         }
     },
     {   // Krok 12
@@ -2432,6 +2557,7 @@ const TUTORIAL_STEPS = [
         nextBtn: true,
         position: 'right',
         pulseHighlight: true,
+        hideOverlay: true,
         action: () => {
             document.getElementById("btn-battle-inv").classList.remove('tutorial-highlight-pulse');
             // Zeby przycisk wyjscia faktycznie widac (bo normalnie utopiec nie jest bossem wiec widac)
@@ -2442,6 +2568,7 @@ const TUTORIAL_STEPS = [
         text: "", // Puste okno znika
         highlight: null,
         nextBtn: false,
+        hideOverlay: true,
         action: () => {
             hideTutorialUI(); // ukrywamy samouczek by toczyła się normalna walka 
         }
@@ -2536,7 +2663,7 @@ function showTutorialStep(stepIndex) {
     const config = TUTORIAL_STEPS[stepIndex];
     if (!config) return;
 
-    tutorialState.overlay.style.display = "block";
+    tutorialState.overlay.style.display = config.hideOverlay ? "none" : "block";
     tutorialState.bubble.style.display = "flex";
 
     // Format text
@@ -2614,4 +2741,58 @@ function showAdHocStep() {
     };
 
     document.body.classList.add('tutorial-disable-clicks');
+}
+
+// ------------------- DEV TOOLS -------------------
+let keysPressed = {};
+document.addEventListener('keydown', (e) => {
+    keysPressed[e.key] = true;
+    if (keysPressed['Control'] && keysPressed['6'] && keysPressed['7']) {
+        document.getElementById('dev-tools-modal').style.display = 'block';
+    }
+});
+document.addEventListener('keyup', (e) => {
+    delete keysPressed[e.key];
+});
+
+function closeDevTools() {
+    document.getElementById('dev-tools-modal').style.display = 'none';
+}
+
+function unlockAllMonsters() {
+    stats.maxUnlockedIndex = Object.keys(monsterTemplates).length - 1;
+    saveGame();
+    showToast('Odblokowano wszystkie potwory!', 'green');
+}
+
+function setStats() {
+    stats.gold = parseInt(document.getElementById('dev-gold').value) || stats.gold;
+    stats.maxHp = parseInt(document.getElementById('dev-hp').value) || stats.maxHp;
+    stats.atk = parseInt(document.getElementById('dev-atk').value) || stats.atk;
+    stats.arm = parseInt(document.getElementById('dev-arm').value) || stats.arm;
+    stats.agi = parseInt(document.getElementById('dev-agi').value) || stats.agi;
+    stats.hp = stats.maxHp;
+    updateUI();
+    saveGame();
+    showToast('Statystyki nadpisane!', 'green');
+}
+
+function giveHerbs() {
+    const herbs = shopItems.filter(i => i.sub === 'herb');
+    herbs.forEach(herb => {
+        for(let i=0; i<10; i++){
+            inventory.push({ ...herb, uid: Date.now() + Math.random() });
+        }
+    });
+    showToast('Otrzymano po 10 każdego zioła!', 'green');
+}
+
+function instantKill() {
+    if (!battleState.active) {
+         showToast('Brak walki', 'yellow');
+         return;
+    }
+    monster.hp = 0;
+    updateMonsterHP();
+    checkWinOrContinue();
 }

@@ -1,0 +1,81 @@
+const shopItems = [
+    // --- BROŃ (DMG: 8 -> 8 000) ---
+    { id: 1, name: "Kord szermierczy", price: 100, atk: 8, rarity: 'common', type: 'weapon', desc: "Lekka broń treningowa." },
+    { id: 2, name: "Srebrny Miecz", price: 500, atk: 30, rarity: 'common', type: 'weapon', desc: "Podstawa na potwory." },
+    { id: 3, name: "Harvall", price: 1200, atk: 65, rarity: 'rare', type: 'weapon', desc: "Gisermeński miecz o dobrym wyważeniu." },
+    { id: 4, name: "Gwyhyr", price: 3500, atk: 150, rarity: 'rare', type: 'weapon', desc: "Mistrzowska robota gnomów." },
+    { id: 5, name: "D'yaebl", price: 8500, atk: 350, rarity: 'epic', type: 'weapon', desc: "Diabelsko ostre i ciężkie ostrze." },
+    { id: 6, name: "Miecz z Mahakamu", price: 15000, atk: 600, rarity: 'epic', type: 'weapon', desc: "Praktycznie niezniszczalny." },
+    { id: 31, name: "Ciri's Zirael", price: 35000, atk: 1200, rarity: 'legendary', type: 'weapon', desc: "Miecz Jaskółki. Przecina czas i przestrzeń." },
+    { id: 32, name: "Aerondight", price: 65000, atk: 2500, rarity: 'legendary', type: 'weapon', desc: "Rośnie w siłę z każdym ciosem." },
+    { id: 33, name: "Miecz Przeznaczenia", price: 120000, atk: 4500, rarity: 'legendary', type: 'weapon', desc: "Ma dwa ostrza. Jednym jesteś Ty." },
+    { id: 34, name: "Ostrze Zimy", price: 250000, atk: 9500, rarity: 'legendary', type: 'weapon', desc: "Dar od Króla Skellige. Zamraża krew w żyłach." },
+
+    // --- ZBROJE LEKKIE / ZWINSTOŚĆ (Skalowanie Agi: 5 -> 180) ---
+    { id: 7, name: "Przeszywanica", price: 150, agi: 5, type: 'armor', rarity: 'common', desc: "Tania ochrona i swoboda ruchów." },
+    { id: 8, name: "Kurtka Szkoły Kota", price: 900, agi: 15, arm: 15, type: 'armor', rarity: 'rare', desc: "Dla mistrzów uników." },
+    { id: 9, name: "Zbroja Kaer Morhen", price: 2200, arm: 80, agi: 5, type: 'armor', rarity: 'rare', desc: "Klasyczny rynsztunek wiedźmiński." },
+    { id: 22, name: "Zbroja Mantikory", price: 6500, agi: 30, arm: 150, type: 'armor', rarity: 'epic', desc: "Zwiększa refleks i tolerancję na ból." },
+    { id: 35, name: "Pancerz z Nilfgaardu", price: 15000, agi: 50, arm: 400, type: 'armor', rarity: 'epic', desc: "Czarne słońce daje szybkość." },
+    { id: 36, name: "Skóra Białego Wilka", price: 45000, agi: 75, arm: 1000, type: 'armor', rarity: 'legendary', desc: "Uniki stają się instynktem." },
+    { id: 37, name: "Tunicja Elfów Aen Elle", price: 90000, agi: 110, arm: 2500, type: 'armor', rarity: 'legendary', desc: "Niematerialna lekkość bytu." },
+    { id: 39, name: "Opończa Wyższego Wampira", price: 250000, agi: 180, arm: 6000, type: 'armor', rarity: 'legendary', desc: "Szybkość przekraczająca granice śmiertelników." },
+
+    // --- ZBROJE CIĘŻKIE / TANK (Skalowanie Arm: 450 -> 45 000) ---
+    { id: 10, name: "Pancerz Niedźwiedzia", price: 8000, arm: 450, type: 'armor', rarity: 'epic', desc: "Kuta stal kosztuje. Prawdziwa forteca." },
+    { id: 40, name: "Zbroja Brygady Impera", price: 22000, arm: 1500, type: 'armor', rarity: 'epic', desc: "Import z południa. Cło wliczone w cenę." },
+    { id: 41, name: "Pancerz Gryfa", price: 55000, arm: 5000, type: 'armor', rarity: 'epic', desc: "Rytualnie hartowana stal." },
+    { id: 42, name: "Zbroja Płonącej Róży", price: 120000, arm: 12000, type: 'armor', rarity: 'legendary', desc: "Zbroja godna wielkiego mistrza." },
+    { id: 43, name: "Płyta z Mahakamu", price: 280000, arm: 22000, type: 'armor', rarity: 'legendary', desc: "Krasnoludy nie znają pojęcia 'tanio'." },
+    { id: 44, name: "Zbroja Hen Gaidth", price: 550000, arm: 35000, type: 'armor', rarity: 'legendary', desc: "Karmazynowa legenda." },
+    { id: 45, name: "Tesham Mutna", price: 1200000, arm: 60000, type: 'armor', rarity: 'legendary', desc: "Szczyt wytrzymałości." },
+
+    // --- UŻYTKOWE ---
+    { id: 13, name: "Jaskółka", price: 60, type: 'consumable', sub: 'pot', rarity: 'common', desc: "🧪 Podstawowa regeneracja (+40% HP)." },
+    { id: 15, name: "Samum", price: 200, type: 'consumable', sub: 'bomb', rarity: 'common', desc: "💣 Ogłuszająca petarda (150 DMG)." },
+    { id: 14, name: "Puszczyk", price: 1500, type: 'consumable', sub: 'atk_perm', rarity: 'rare', desc: "📖 Wiedza o punktach witalnych (+5 Atak)." },
+    { id: 17, name: "Grom", price: 1500, type: 'consumable', sub: 'arm_perm', rarity: 'rare', desc: "🧪 Alchemiczne wzmocnienie skóry (+5 Obrona)." },
+    { id: 46, name: "Dekokt Raffarda Białego", price: 6000, type: 'consumable', sub: 'pot_full', rarity: 'epic', desc: "✨ Natychmiast leczy wszystkie rany." },
+    { id: 16, name: "Kartacz", price: 2500, type: 'consumable', sub: 'bomb_super', rarity: 'rare', desc: "💥 Rozrywa pancerz wrogów (350 DMG)." },
+    { id: 47, name: "Filtr Petriego", price: 12000, type: 'consumable', sub: 'sign_perm', rarity: 'epic', desc: "✨ Zwiększa moc znaków na stałe." },
+    { id: 48, name: "Eliksir Oczyszczenia", price: 20000, type: 'consumable', sub: 'reset', rarity: 'epic', desc: "🌀 Pozwala zresetować statystyki." },
+
+    // --- ZIOŁA ---
+    { id: 101, name: "Jaskółcze ziele", price: 15, type: 'consumable', sub: 'herb', rarity: 'common', desc: "Podstawowe zioło." },
+    { id: 102, name: "Arenaria", price: 18, type: 'consumable', sub: 'herb', rarity: 'common', desc: "Biały kwiat rosnący na równinach." },
+    { id: 103, name: "Blekot", price: 20, type: 'consumable', sub: 'herb', rarity: 'common', desc: "Roślina o ciemnych liściach." },
+    { id: 104, name: "Szytna", price: 25, type: 'consumable', sub: 'herb', rarity: 'common', desc: "Kłujący krzew." },
+    { id: 105, name: "Wilczy aloes", price: 30, type: 'consumable', sub: 'herb', rarity: 'rare', desc: "Rzadka, zimowa odmiana aloesu." },
+    { id: 106, name: "Ginatia", price: 35, type: 'consumable', sub: 'herb', rarity: 'rare', desc: "Płatki wykorzystywane w delikatnych eliksirach." },
+    { id: 107, name: "Krew ghula", price: 80, type: 'consumable', sub: 'herb', rarity: 'epic', desc: "Składnik monstrualny. Cuchnie padliną." },
+    { id: 108, name: "Płatki białego mirtu", price: 40, type: 'consumable', sub: 'herb', rarity: 'rare', desc: "Kwiaty o odurzającym zapachu." },
+    { id: 109, name: "Korzeń mandragory", price: 100, type: 'consumable', sub: 'herb', rarity: 'epic', desc: "Niezwykle potężny katalizator." },
+    { id: 110, name: "Siarka", price: 50, type: 'consumable', sub: 'herb', rarity: 'rare', desc: "Alchemiczny minerał o ostrym zapachu." },
+    { id: 111, name: "Saletra", price: 45, type: 'consumable', sub: 'herb', rarity: 'rare', desc: "Proszek niezbędny do petard i eliksirów." },
+    { id: 112, name: "Jad wiwerny", price: 150, type: 'consumable', sub: 'herb', rarity: 'legendary', desc: "Składnik monstrualny. Wysoce toksyczny." },
+    { id: 113, name: "Wątroba wilkołaka", price: 180, type: 'consumable', sub: 'herb', rarity: 'legendary', desc: "Składnik monstrualny. Nasycona klątwą." },
+    { id: 114, name: "Mózg utopca", price: 60, type: 'consumable', sub: 'herb', rarity: 'rare', desc: "Składnik monstrualny. Pokryty mułem." },
+    { id: 115, name: "Oczy nekkera", price: 70, type: 'consumable', sub: 'herb', rarity: 'epic', desc: "Składnik monstrualny. Widzą w ciemności." },
+    { id: 116, name: "Kordel", price: 15, type: 'consumable', sub: 'herb', rarity: 'common', desc: "Pospolita, twarda roślina." },
+    { id: 117, name: "Werbena", price: 20, type: 'consumable', sub: 'herb', rarity: 'common', desc: "Zioło o fioletowych kwiatach." },
+    { id: 118, name: "Szyszka chmielu", price: 10, type: 'consumable', sub: 'herb', rarity: 'common', desc: "Zwykle używana do piwa, też do alchemii." },
+    { id: 119, name: "Ząb jadowy kikimory", price: 90, type: 'consumable', sub: 'herb', rarity: 'epic', desc: "Składnik monstrualny. Ostry jak brzytwa." },
+    { id: 120, name: "Pustyrnik", price: 40, type: 'consumable', sub: 'herb', rarity: 'rare', desc: "Ziele używane do medytacji." },
+
+    // --- OLEJE ---
+    { id: 301, name: "Olej na Trupojady", price: 80, type: 'consumable', sub: 'oil', rarity: 'common', desc: "🗡️ +50% ATK przeciwko Trupojadom w najbliższej bitwie.", targetClass: 'Trupojad' },
+    { id: 302, name: "Olej na Wampiry", price: 150, type: 'consumable', sub: 'oil', rarity: 'rare', desc: "🗡️ +50% ATK przeciw krwiopijcom w najbliższej bitwie.", targetClass: 'Wampir' },
+    { id: 303, name: "Olej na Drakonidy", price: 150, type: 'consumable', sub: 'oil', rarity: 'rare', desc: "🗡️ +50% ATK przeciw bestiom z nieba w najbliższej bitwie.", targetClass: 'Drakonid' },
+    { id: 304, name: "Olej na Relikty", price: 300, type: 'consumable', sub: 'oil', rarity: 'epic', desc: "🗡️ +50% ATK przeciw potężnym, wiecznym bestiom w najbliższej bitwie.", targetClass: 'Relikt' },
+
+    // --- TALIZMANY ---
+    { id: 18, name: "Ząb Utopca", price: 400, atk: 8, type: 'trinket', rarity: 'common', desc: "Szczęście neofity." },
+    { id: 19, name: "Medalion Wilka", price: 2500, maxHp: 300, type: 'trinket', rarity: 'rare', desc: "Wibruje w walce." },
+    { id: 20, name: "Pierścień Kota", price: 5500, agi: 25, type: 'trinket', rarity: 'rare', desc: "Kocie ruchy (+25 Agi)." },
+    { id: 50, name: "Kamień Runiczny", price: 12000, atk: 250, type: 'trinket', rarity: 'epic', desc: "Magiczne runy na ostrzu." },
+    { id: 21, name: "Pierścień Mocy", price: 35000, maxHp: 1500, atk: 600, type: 'trinket', rarity: 'epic', desc: "Potężny artefakt." },
+    { id: 51, name: "Klejnot Północy", price: 75000, arm: 1500, agi: 60, type: 'trinket', rarity: 'epic', desc: "Mroźna ochrona." },
+    { id: 52, name: "Serce Biesa", price: 150000, maxHp: 8000, type: 'trinket', rarity: 'legendary', desc: "Nienaturalna żywotność." },
+    { id: 53, name: "Oko Proroka", price: 300000, agi: 120, atk: 2000, type: 'trinket', rarity: 'legendary', desc: "Widzisz przyszłość." },
+    { id: 55, name: "Medalion Gauntera", price: 1000000, atk: 8000, agi: 200, type: 'trinket', rarity: 'legendary', desc: "Pakt podpisany krwią." }
+];

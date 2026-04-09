@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Wiedźmiński Szlak</title>
+    <link href="https://fonts.googleapis.com/css2?family=MedievalSharp&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 
@@ -15,12 +16,6 @@
     <!-- Powiadomienia (dodaj tuż pod otwarciem body) -->
     <div id="notification-area" style="position: fixed; top: 20px; right: 20px; z-index: 9999;"></div>
 
-    <!-- Samouczek -->
-    <div id="tutorial-overlay"></div>
-    <div id="tutorial-bubble">
-        <div id="tutorial-text">...</div>
-        <button id="tutorial-next-btn" class="tutorial-bubble-btn" onclick="advanceTutorial()">Dalej</button>
-    </div>
 
     <div class="game-container" id="mainContainer">
         <!-- Pasek statystyk -->
@@ -29,6 +24,13 @@
             <span>⚔️ <span id="atkDisp">15</span></span>
             <span>🛡️ <span id="armDisp">0</span></span>
             <span>👟 <span id="agiDisp">10</span></span>
+        </div>
+
+        <!-- Samouczek (przeniesiony do wewnątrz kontenera by naprawić błędny z-index pokrywający obramowania) -->
+        <div id="tutorial-overlay"></div>
+        <div id="tutorial-bubble">
+            <div id="tutorial-text">...</div>
+            <button id="tutorial-next-btn" class="tutorial-bubble-btn" onclick="advanceTutorial()">Dalej</button>
         </div>
 
         <!-- Menu Główne -->
@@ -66,29 +68,49 @@
             </button>
         </div>
         <div id="alchemy" class="screen" style="display:none;">
-            <h3 style="color:#2ecc71">🌿 Kocioł Alchemiczny</h3>
-            <p style="font-size:0.85rem; color:#ccc;">Dodawaj zioła do kotła. Różne proporcje dają różne eliksiry i
-                oleje!</p>
+            <h3 style="color:#2ecc71; text-shadow: 0 0 10px rgba(46,204,113,0.4);">🌿 Warsztat Alchemiczny</h3>
+            <p style="font-size:0.85rem; color:#ccc; font-style: italic;">Sprostaj chemii natury. Dobieraj składniki i
+                mieszaj eliksiry.</p>
 
-            <div id="cauldron-container" style="text-align: center; margin: 20px 0;">
-                <div id="cauldron" style="font-size: 4rem; display: inline-block; transition: 0.3s;">🍲</div>
-                <div style="margin-top: 10px;">
-                    Składniki w kotle: <span id="cauldron-count" style="color: #2ecc71; font-weight: bold;">0</span> / 3
+            <div id="cauldron-slots"
+                style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; border: 1px solid #444; padding: 15px; background: #1a1a1a; border-radius: 8px;">
+                <div class="alchemy-slot" id="alchemy-slot-1"
+                    style="padding: 15px; border: 1px dashed #555; text-align: center; color: #888; font-weight: bold;">
+                    I. Pusto</div>
+                <div class="alchemy-slot" id="alchemy-slot-2"
+                    style="padding: 15px; border: 1px dashed #555; text-align: center; color: #888; font-weight: bold;">
+                    II. Pusto</div>
+                <div class="alchemy-slot" id="alchemy-slot-3"
+                    style="padding: 15px; border: 1px dashed #555; text-align: center; color: #888; font-weight: bold;">
+                    III. Pusto</div>
+                <div class="alchemy-slot" id="alchemy-slot-4"
+                    style="padding: 15px; border: 1px dashed #555; text-align: center; color: #888; font-weight: bold;">
+                    IV. Pusto</div>
+            </div>
+
+            <div class="alchemy-actions" style="display: flex; gap: 10px; margin-bottom: 20px;">
+                <button onclick="brewPotion()" id="btn-brew" class="btn-buy alchemy-brew-btn"
+                    style="flex:2; font-weight: bold;">🔥 WARZ MIKSTURĘ 🔥</button>
+                <button onclick="emptyCauldron()" class="menu-btn alchemy-empty-btn" style="flex:1;">Wyjmij
+                    składniki</button>
+            </div>
+
+            <div class="alchemy-herbs-panel"
+                style="border: 1px solid #333; border-radius: 8px; padding: 10px; background: #111;">
+                <div style="display: flex; gap: 5px; margin-bottom: 10px;">
+                    <button onclick="renderAlchemyTab('herbs')" id="alchemy-tab-herbs"
+                        style="flex:1; padding:5px; background: var(--gold); color: black; font-weight: bold;">Twoje
+                        Zioła</button>
+                    <button onclick="renderAlchemyTab('recipes')" id="alchemy-tab-recipes"
+                        style="flex:1; padding:5px; background: #222;">Receptury</button>
+                </div>
+                <div id="herbs-list" class="alchemy-grid"
+                    style="display: flex; flex-wrap: wrap; gap: 5px; max-height: 250px; overflow-y: auto;">
+                    <!-- Zioła z ekwipunku generowane dynamicznie -->
                 </div>
             </div>
 
-            <h4 style="color:var(--gold); border-bottom: 1px solid #333; padding-bottom: 5px;">Zioła w Ekwipunku</h4>
-            <div id="herbs-list"
-                style="display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-bottom: 20px;">
-                <!-- Zioła z ekwipunku -->
-            </div>
-
-            <button onclick="brewPotion()" class="btn-buy" style="width:100%; margin-bottom: 10px;">WARZ MIKSTURĘ
-                (Mieszaj Kocioł)</button>
-            <button onclick="emptyCauldron()" class="menu-btn" style="width:100%; margin-bottom: 20px;">Wylej zawartość
-                kotła</button>
-
-            <button onclick="switchTab('menu')" style="width:100%;">Wróć do Menu</button>
+            <button onclick="switchTab('menu')" style="width:100%; margin-top:20px;">Wróć do Menu</button>
         </div>
 
 
@@ -103,8 +125,9 @@
                 <button onclick="renderShop('blacksmith')" style="flex:1; font-size:0.7rem;">🔨 Kowal
                     (Zbroje/Bronie)</button>
                 <button onclick="renderShop('herbalist')" style="flex:1; font-size:0.7rem;">🌿 Zielarka
-                    (Zioła/Potki)</button>
-                <button onclick="renderShop('merchant')" style="flex:1; font-size:0.7rem;">💰 Kupiec (Różności)</button>
+                    (Składniki mikstur)</button>
+                <button onclick="renderShop('merchant')" style="flex:1; font-size:0.7rem;">💰 Kupiec (Co ma to
+                    sprzeda)</button>
             </div>
             <div id="shop-list"></div>
             <button onclick="switchTab('menu')" style="width:100%; margin-top:10px;">Wróć do Menu</button>
@@ -130,15 +153,22 @@
             </div>
             <div class="sign-selector"
                 style="margin-bottom: 20px; background: #222; padding: 10px; border-radius: 8px; text-align: center;">
-                <p style="font-size: 0.8rem; color: #ccc; margin-bottom: 10px;">Wszystkie Znaki Wiedźmińskie są gotowe
-                    do użycia w walce.</p>
                 <button onclick="upgradeSignsUI()"
                     style="font-size: 0.7rem; padding: 8px 15px; background: var(--gold); color: black; font-weight: bold;">DRZEWKO
                     BIEGŁOŚCI ZNAKÓW</button>
             </div>
 
-
-            <div id="inv-list"></div>
+            <div class="inv-tabs" style="display: flex; gap: 5px; margin-bottom: 15px; flex-wrap: wrap;">
+                <button onclick="changeInvTab('equipment')" id="tab-equipment"
+                    style="flex:1; padding: 10px; background: var(--gold); color: black; font-weight: bold;">Sprzęt</button>
+                <button onclick="changeInvTab('consumable')" id="tab-consumable"
+                    style="flex:1; padding: 10px; background: #222;">Użytkowe</button>
+                <button onclick="changeInvTab('herb')" id="tab-herb"
+                    style="flex:1; padding: 10px; background: #222;">Zioła</button>
+                <button onclick="changeInvTab('recipe')" id="tab-recipe"
+                    style="flex:1; padding: 10px; background: #222;">Receptury</button>
+            </div>
+            <div id="inv-list" style="display: flex; flex-direction: column; gap: 10px;"></div>
             <button onclick="switchTab('menu')" style="width:100%; margin-top:20px;">Wróć</button>
         </div>
 
@@ -207,9 +237,12 @@
 
                 <!-- Główne przyciski akcji -->
                 <div class="controls" id="battleActions">
-                    <button onclick="handleAction('attack')" id="btn-main-attack" class="btn-main-attack">⚔️ Szybki Atak</button>
-                    <button onclick="openWitcherPanel('inv')" id="btn-battle-inv" style="background:#444;">🎒 Przedmioty</button>
-                    <button onclick="openWitcherPanel('signs')" id="btn-battle-signs" style="background:#2e4a62;">✨ Znaki</button>
+                    <button onclick="handleAction('attack')" id="btn-main-attack" class="btn-main-attack">⚔️ Szybki
+                        Atak</button>
+                    <button onclick="openWitcherPanel('inv')" id="btn-battle-inv" style="background:#444;">🎒
+                        Przedmioty</button>
+                    <button onclick="openWitcherPanel('signs')" id="btn-battle-signs" style="background:#2e4a62;">✨
+                        Znaki</button>
                 </div>
 
                 <!-- PRZYWRÓCONY PRZYCISK NAGRODY -->
@@ -335,6 +368,34 @@
     </div>
 
     <script src="script.js"></script>
+
+    <!-- DEV TOOLS MODAL -->
+    <div id="dev-tools-modal"
+        style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); background:#111; border:2px solid var(--gold); padding:20px; z-index:1000000; border-radius:10px; width:300px; color:white; font-family:Courier, monospace;">
+        <h2 style="color:var(--gold); text-align:center;">DEV TOOLS</h2>
+        <div style="margin-bottom:10px;"><label>Gold: </label><input type="number" id="dev-gold" style="width:100%;">
+        </div>
+        <div style="margin-bottom:10px;"><label>Max HP: </label><input type="number" id="dev-hp" style="width:100%;">
+        </div>
+        <div style="margin-bottom:10px;"><label>ATK: </label><input type="number" id="dev-atk" style="width:100%;">
+        </div>
+        <div style="margin-bottom:10px;"><label>ARM: </label><input type="number" id="dev-arm" style="width:100%;">
+        </div>
+        <div style="margin-bottom:10px;"><label>AGI: </label><input type="number" id="dev-agi" style="width:100%;">
+        </div>
+
+        <button onclick="setStats()"
+            style="width:100%; margin-bottom:10px; background:var(--gold); color:black; font-weight:bold; cursor:pointer;">Nadpisz
+            Statystyki</button>
+        <button onclick="unlockAllMonsters()" style="width:100%; margin-bottom:10px; cursor:pointer;">Odblokuj
+            Potwory</button>
+        <button onclick="giveHerbs()" style="width:100%; margin-bottom:10px; cursor:pointer;">Zioła +10</button>
+        <button onclick="instantKill()"
+            style="width:100%; margin-bottom:10px; background:darkred; color:white; cursor:pointer;">Instant Kill (w
+            walce)</button>
+        <button onclick="closeDevTools()" style="width:100%; cursor:pointer;">Zamknij</button>
+    </div>
+
 </body>
 
 </html>
