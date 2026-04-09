@@ -468,6 +468,24 @@ function renderShop(merchantType = 'blacksmith') {
 
 
 
+
+let currentInvTab = 'equipment';
+function changeInvTab(tabName) {
+    currentInvTab = tabName;
+    document.querySelectorAll('.inv-tabs button').forEach(b => {
+        b.style.background = '#222';
+        b.style.color = '#fff';
+        b.style.fontWeight = 'normal';
+    });
+    const activeBtn = document.getElementById('tab-' + tabName);
+    if(activeBtn) {
+        activeBtn.style.background = 'var(--gold)';
+        activeBtn.style.color = 'black';
+        activeBtn.style.fontWeight = 'bold';
+    }
+    renderInventory();
+}
+
 function renderInventory() {
     const list = document.getElementById('inv-list');
     if (!list) return;
@@ -479,41 +497,43 @@ function renderInventory() {
 
     if (inventory.length === 0) {
         list.innerHTML = "<div style='color:#666; padding:20px; text-align:center;'>Juki są puste...</div>";
-    } else {
-        const types = [
-            { id: 'weapon', name: '⚔️ Bronie' },
-            { id: 'armor', name: '🛡️ Pancerze' },
-            { id: 'consumable', name: '🧪 Użytkowe i Zioła' },
-            { id: 'trinket', name: '💍 Talizmany' }
-        ];
-
-        list.innerHTML = types.map(t => {
-            const itemsOfType = inventory.filter(i => i.type === t.id);
-            if (itemsOfType.length === 0) return '';
-
-            return `
-            <div style="font-weight:bold; color:var(--gold); margin: 15px 0 5px 0; border-bottom: 1px solid #333; text-align: left;">${t.name}</div>
-            <div style="display:flex; flex-direction:column; gap:5px;">
-                ${itemsOfType.map(item => {
-                const invIndex = inventory.indexOf(item);
-                const isEquipped = Object.values(equipped).includes(item);
-                const itemJson = JSON.stringify(item).replace(/"/g, '&quot;');
-                return `
-                    <div class="item-card item-${item.rarity}" 
-                         style="opacity: ${isEquipped ? '0.5' : '1'}" 
-                         onclick="openItemPreview(null, false, ${invIndex})"
-                         onmouseenter="showTooltip(event, 'item', ${itemJson})" 
-                         onmousemove="moveTooltip(event)" 
-                         onmouseleave="hideTooltip()">
-                        <div class="item-info">
-                            <div class="item-type-icon">${item.rarity}</div>
-                            <div class="item-name">${item.name} ${isEquipped ? '(ZAŁOŻONO)' : ''}</div>
-                        </div>
-                    </div>`;
-            }).join('')}
-            </div>`;
-        }).join('');
+        return;
     }
+
+    let filteredItems = [];
+    if (currentInvTab === 'equipment') {
+        filteredItems = inventory.filter(i => i.type === 'weapon' || i.type === 'armor' || i.type === 'trinket');
+    } else if (currentInvTab === 'consumable') {
+        filteredItems = inventory.filter(i => i.type === 'consumable' && i.sub !== 'herb' && i.sub !== 'recipe');
+    } else if (currentInvTab === 'herb') {
+        filteredItems = inventory.filter(i => i.type === 'consumable' && i.sub === 'herb');
+    }
+
+    if (filteredItems.length === 0) {
+        list.innerHTML = "<div style='color:#666; padding:20px; text-align:center;'>Brak przedmiotów w tej kategorii...</div>";
+        return;
+    }
+
+    list.innerHTML = `<div style="display:flex; flex-direction:column; gap:5px;">` + filteredItems.map(item => {
+        const invIndex = inventory.indexOf(item);
+        const isEquipped = Object.values(equipped).includes(item);
+        const itemJson = JSON.stringify(item).replace(/"/g, '&quot;');
+        
+        let customAction = `onclick="openItemPreview(null, false, ${invIndex})"`;
+
+        return `
+            <div class="item-card item-${item.rarity || 'common'}" 
+                 style="opacity: ${isEquipped ? '0.5' : '1'}" 
+                 ${customAction}
+                 onmouseenter="showTooltip(event, 'item', ${itemJson})" 
+                 onmousemove="moveTooltip(event)" 
+                 onmouseleave="hideTooltip()">
+                <div class="item-info">
+                    <div class="item-type-icon">${item.rarity || 'common'}</div>
+                    <div class="item-name">${item.name} ${isEquipped ? '(ZAŁOŻONO)' : ''} ${item.qty && item.qty > 1 ? 'x'+item.qty : ''}</div>
+                </div>
+            </div>`;
+    }).join('') + `</div>`;
 }
 
 function updateUI() {
@@ -593,7 +613,6 @@ function buyItem(id) {
 
     // KLUCZOWY ZAPIS: Po każdej transakcji
     updateUI();
-    saveGame();
 }
 
 function sellItem(index) {
@@ -915,12 +934,12 @@ function handleAction(type) {
         document.getElementById('battleActions').style.opacity = "0.5";
 
         function applyOilBuff(oilName, monsterClass) {
-    if (!oilName) return 1.0;
-    if (oilName === monsterClass) {
-        return 1.5;
-    }
-    return 1.0;
-}
+            if (!oilName) return 1.0;
+            if (oilName === monsterClass) {
+                return 1.5;
+            }
+            return 1.0;
+        }
 
         // --- PANCERNY BALANS DMG (Zasada 10% Przebicia) ---
         // Obliczamy surowe obrażenia (Atak - Pancerz wroga)
@@ -1348,7 +1367,7 @@ function useItemFromBattle(id) {
             container.classList.add('heal-effect');
             setTimeout(() => container.classList.remove('heal-effect'), 600);
         }
-        
+
         // --- LOSOWY WYWAR ---
         if (item.sub === 'random_pot') {
             if (Math.random() > 0.5) {
@@ -1359,7 +1378,7 @@ function useItemFromBattle(id) {
                 let dmg = Math.floor(stats.maxHp * 0.15);
                 stats.hp -= dmg;
                 addLog(`Wypiłeś ${item.name}. Trucizna! (-${dmg} HP)`, "red");
-                if (stats.hp <= 0) stats.hp = 1; 
+                if (stats.hp <= 0) stats.hp = 1;
             }
         }
     }
@@ -2195,18 +2214,18 @@ function brewPotion() {
         btn.innerText = oldBtnText;
         document.querySelectorAll('.alchemy-slot').forEach(s => s.style.backgroundColor = 'transparent');
 
-        let seqNames = cauldronItems.map(i => i.name).sort().join(','); 
+        let seqNames = cauldronItems.map(i => i.name).sort().join(',');
 
         let crafted = null;
         for (let r of RECIPES_BY_NAMES) {
             let limit = Math.floor((stats.maxUnlockedIndex || 0) / 2);
             let isUnlocked = (r.unlockIndex <= limit);
             if (r.seq.slice().sort().join(',') === seqNames) {
-                if(isUnlocked) {
+                if (isUnlocked) {
                     crafted = r;
                     break;
                 } else {
-                    crafted = r; 
+                    crafted = r;
                     break;
                 }
             }
@@ -2215,7 +2234,7 @@ function brewPotion() {
         if (crafted) {
             let newItem = shopItems.find(i => i.id === crafted.resultId);
             if (!newItem) {
-                newItem = { id: 900+Math.floor(Math.random()*100), name: crafted.target, type: 'consumable', sub: (crafted.target.includes('Olej') ? 'oil' : 'potion'), price: 50, desc: `Wytworzone samodzielnie w kotle.` };
+                newItem = { id: 900 + Math.floor(Math.random() * 100), name: crafted.target, type: 'consumable', sub: (crafted.target.includes('Olej') ? 'oil' : 'potion'), price: 50, desc: `Wytworzone samodzielnie w kotle.` };
             }
             if (crafted.target === "Jaskółka" || newItem.sub === 'potion') stats.pot++;
             if (crafted.target === "Samum" || newItem.sub === 'bomb') stats.bomb++;
@@ -2780,7 +2799,7 @@ function setStats() {
 function giveHerbs() {
     const herbs = shopItems.filter(i => i.sub === 'herb');
     herbs.forEach(herb => {
-        for(let i=0; i<10; i++){
+        for (let i = 0; i < 10; i++) {
             inventory.push({ ...herb, uid: Date.now() + Math.random() });
         }
     });
@@ -2789,8 +2808,8 @@ function giveHerbs() {
 
 function instantKill() {
     if (!battleState.active) {
-         showToast('Brak walki', 'yellow');
-         return;
+        showToast('Brak walki', 'yellow');
+        return;
     }
     monster.hp = 0;
     updateMonsterHP();

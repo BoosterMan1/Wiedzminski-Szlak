@@ -1842,11 +1842,12 @@ button:hover {
     box-shadow: 0 0 15px rgba(46, 204, 113, 0.4) !important;
     font-family: 'MedievalSharp', cursive !important;
     height: 100%;
+    transition: all 0.3s ease;
 }
 
 .alchemy-brew-btn:hover {
     background: linear-gradient(135deg, #2ecc71 0%, #1e5a1e 100%) !important;
-    box-shadow: 0 0 25px rgba(46, 204, 113, 0.6) !important;
+    box-shadow: 0 0 25px rgba(4, 129, 56, 0.6) !important;
     color: black !important;
 }
 
@@ -1862,7 +1863,9 @@ button:hover {
    ======================================================== */
 
 /* 1. TYPOGRAFIA I NAGŁÓWKI (PISANA CZCIONKA) */
-h1, h2, h3 {
+h1,
+h2,
+h3 {
     font-family: 'MedievalSharp', cursive, serif !important;
     text-transform: uppercase;
     letter-spacing: 2px;
@@ -1878,7 +1881,8 @@ h2 {
 }
 
 h3 {
-    color: #e2d1b0 !important; /* Stary pergamin/kość */
+    color: #e2d1b0 !important;
+    /* Stary pergamin/kość */
     margin-bottom: 15px;
     text-shadow: none !important;
 }
@@ -1914,14 +1918,15 @@ h3 {
 }
 
 .monster-grid-scrollable {
-    height: 550px !important; /* Większe by pomieściło potwory bez ścisku */
+    height: 550px !important;
+    /* Większe by pomieściło potwory bez ścisku */
 }
 
 /* 3. ALCHEMIA – DUŻE WYZWOLONE SLOTY NA ŚRODKU */
 #alchemy {
     background: radial-gradient(circle at center, #1b1b1b 0%, #0a0a0a 100%);
     border-radius: 10px;
-    box-shadow: inset 0 0 50px rgba(0,0,0,0.9);
+    box-shadow: inset 0 0 50px rgba(0, 0, 0, 0.9);
 }
 
 #cauldron-slots {
@@ -1938,8 +1943,9 @@ h3 {
 
 .alchemy-slot {
     background: linear-gradient(to bottom right, #252525, #111) !important;
-    border: 2px solid #555 !important;
-    border-radius: 50% !important; /* Kuliste sloty - wyglądają wiedźmińsko! */
+    border: 2px dotted #555 !important;
+    border-radius: 2% !important;
+    /* Kuliste sloty - wyglądają wiedźmińsko! */
     aspect-ratio: 1 / 1;
     display: flex;
     align-items: center;
@@ -1948,14 +1954,15 @@ h3 {
     padding: 15px !important;
     font-family: 'MedievalSharp', cursive;
     color: #999 !important;
-    box-shadow: inset 0 0 20px rgba(0,0,0,0.8), 0 5px 15px rgba(0,0,0,0.5);
+    box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.8), 0 5px 15px rgba(0, 0, 0, 0.5);
     transition: all 0.4s ease;
     font-size: 1.1rem;
 }
 
 /* Stan załadowany zmienia kolor i dodaje aurę */
 .alchemy-slot span {
-    color: #4CAF50 !important; /* Toksyczna jasna zieleń */
+    color: #4CAF50 !important;
+    /* Toksyczna jasna zieleń */
     text-shadow: 0 0 10px rgba(76, 175, 80, 0.5);
     font-weight: bold;
     display: flex;
@@ -1970,7 +1977,7 @@ h3 {
 #herbs-list {
     background: #151515 !important;
     border: 1px inset #333 !important;
-    box-shadow: inset 0 5px 20px rgba(0,0,0,0.9) !important;
+    box-shadow: inset 0 5px 20px rgba(0, 0, 0, 0.9) !important;
     padding: 15px !important;
     gap: 10px !important;
 }
@@ -1983,13 +1990,56 @@ h3 {
 ::-webkit-scrollbar {
     width: 8px;
 }
+
 ::-webkit-scrollbar-track {
-    background: #111; 
+    background: #111;
 }
+
 ::-webkit-scrollbar-thumb {
-    background: #444; 
+    background: #444;
     border-radius: 4px;
 }
+
 ::-webkit-scrollbar-thumb:hover {
-    background: var(--gold); 
+    background: var(--gold);
+}
+
+/* ========================================================
+   WITCHER ANTI-SCROLL OVERRIDES (USER REQUEST)
+   ======================================================== */
+body {
+    height: 100vh !important;
+    max-height: 100vh !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important; /* Blokuje przewijanie całej strony */
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    background: #0a0a0a !important;
+}
+
+.game-container {
+    height: 100vh !important;
+    max-height: 100vh !important;
+    width: 100% !important;
+    max-width: 650px !important; /* Utrzymuje proporcje telefonu/pionowe */
+    overflow-y: auto !important; /* Przewijanie wnętrza gry, a nie całej przeglądarki */
+    overflow-x: hidden !important;
+    display: flex !important;
+    flex-direction: column !important;
+    border-radius: 0 !important; /* zeby pasowalo do ekranu, albo mozna zostawic zaokraglenia jesli jest lekki padding, ale przy height 100vh lepiej 0 */
+}
+
+@media (min-height: 800px) {
+    .game-container {
+        height: 95vh !important;
+        max-height: 900px !important;
+        border-radius: 12px !important;
+    }
+}
+
+.screen {
+    flex-grow: 1 !important;
+    overflow-y: visible !important; /* Zawartość strony samej w sobie wylewa się na .game-container */
 }
