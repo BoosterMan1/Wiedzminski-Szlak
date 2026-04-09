@@ -344,7 +344,7 @@ button:hover {
     display: flex;
     flex-direction: column;
     gap: 10px;
-    height: 400px;
+    height: 350px;
 }
 
 .inv-item {
