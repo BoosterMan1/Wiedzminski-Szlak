@@ -303,67 +303,59 @@
             </div>
         </div>
 
-    </div> <!-- KONIEC game-container -->
+
 
     <!-- Menu Treningu -->
-    <div id="training" class="screen" style="display:none;">
-        <h3 style="color:var(--gold)">⚔️ Plac Treningowy Kaer Morhen</h3>
+    
+        <!-- Menu Treningu -->
+        <div id="training" class="screen" style="display:none;">
+            <h3 class="witcher-title">⚔️ Plac Treningowy Kaer Morhen</h3>
 
-        <!-- PODSEKCJA 1: KLASYCZNA KUKŁA -->
-        <div id="training-classic">
-            <p style="font-size:0.8rem; color:#888; margin-bottom: 20px;">Ręczne ustawianie parametrów kukły
-                treningowej.</p>
+            <!-- PODSEKCJA 1: KLASYCZNA KUKŁA -->
+            <div id="training-classic">
+                <p style="font-size:0.8rem; color:#888; margin-bottom: 20px;">Ręczne ustawianie parametrów kukły treningowej.</p>
 
-            <div class="training-slider-container">
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <label style="color: #aaa; font-size: 0.75rem; text-transform: uppercase;">Poziom Trudności</label>
-                    <span id="agiValue">1.0</span>
+                <div class="training-slider-container" style="background: rgba(255,255,255,0.05); border: 1px solid #333; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                        <label style="color: #aaa; font-size: 0.75rem; text-transform: uppercase;">Poziom Trudności</label>
+                        <span id="agiValue" style="color: var(--gold); font-weight: bold;">1.0</span>
+                    </div>
+                    <input type="range" id="agiSlider" min="0.5" max="8.0" value="1.0" step="0.1" style="width: 100%;"
+                        oninput="document.getElementById('agiValue').innerText = parseFloat(this.value).toFixed(1) + 'x'">
                 </div>
-                <input type="range" id="agiSlider" min="0.5" max="8.0" value="1.0" step="0.1"
-                    oninput="document.getElementById('agiValue').innerText = parseFloat(this.value).toFixed(1) + 'x'">
+
+                <div id="training-list" class="monster-grid">
+                    <div class="monster-card witcher-card" onclick="startTraining('normal')"><b>Klasyczny atak</b></div>
+                    <div class="monster-card witcher-card" onclick="startTraining('charge')"><b>Szarża</b></div>
+                    <div class="monster-card witcher-card" onclick="startTraining('mirage')"><b>Iluzja</b></div>
+                    <div class="monster-card witcher-card" onclick="startTraining('combo')"><b>Grad ciosów</b></div>
+                    <div class="monster-card witcher-card" onclick="startTraining('orbit')"><b>Spirala</b></div>
+                    <div class="monster-card witcher-card" onclick="startTraining('blink')"><b>Teleportacja</b></div>
+                </div>
+
+                <button onclick="toggleTrainingMode('monsters')" class="witcher-btn action-btn full-width" style="margin-top:20px;">
+                    ⚔️ Ćwicz na stworach
+                </button>
             </div>
 
-            <div id="training-list" class="monster-grid">
-                <div class="monster-card" onclick="startTraining('normal')"><b>Klasyczny atak</b></div>
-                <div class="monster-card" onclick="startTraining('charge')"><b>Szarża</b></div>
-                <div class="monster-card" onclick="startTraining('mirage')"><b>Iluzja</b></div>
-                <div class="monster-card" onclick="startTraining('combo')"><b>Grad ciosów</b></div>
-                <div class="monster-card" onclick="startTraining('orbit')"><b>Spirala</b></div>
-                <div class="monster-card" onclick="startTraining('blink')"><b>Teleportacja</b></div>
+            <!-- PODSEKCJA 2: SYMULACJA POTWORÓW -->
+            <div id="training-monsters" style="display:none;">
+                <p style="font-size:0.8rem; color:#888; margin-bottom: 20px;">Symulacja walki z konkretną bestią (statystyki automatyczne).</p>
+
+                <div id="training-monster-list" class="monster-grid" style="max-height: 400px; overflow-y: auto;">
+                    <!-- Generowane przez JS -->
+                </div>
+
+                <button onclick="toggleTrainingMode('classic')" class="witcher-btn cancel-btn full-width" style="margin-top:20px;">
+                    ↩ Powrót do ćwiczenia na kukiełce
+                </button>
             </div>
 
-            <button onclick="toggleTrainingMode('monsters')" class="menu-btn"
-                style="margin-top:20px; border-left: 4px solid var(--gold) !important;">
-                🐺 Ćwicz na stworach
-            </button>
+            <button onclick="switchTab('menu')" class="witcher-btn cancel-btn full-width" style="margin-top:20px;">Wróć do zamku</button>
         </div>
 
-        <!-- PODSEKCJA 2: SYMULACJA POTWORÓW -->
-        <div id="training-monsters" style="display:none;">
-            <p style="font-size:0.8rem; color:#888; margin-bottom: 20px;">Symulacja walki z konkretną bestią (statystyki
-                automatyczne).</p>
-
-            <div id="training-monster-list" class="monster-grid" style="max-height: 400px; overflow-y: auto;">
-                <!-- Generowane przez JS -->
-            </div>
-
-            <button onclick="toggleTrainingMode('classic')" class="menu-btn"
-                style="margin-top:20px; border-left: 4px solid #444 !important;">
-                ⬅️ Powrót do ćwiczenia na kukiełce
-            </button>
-        </div>
-
-        <button onclick="switchTab('menu')"
-            style="width:100%; margin-top:20px; background: none; border: 1px solid #333;">Wróć do zamku</button>
-    </div>
-
-
-
-    <div id="item-tooltip"
-        style="display: none; position: fixed; pointer-events: none; z-index: 100000; background: rgba(0,0,0,0.9); border: 1px solid #daa520; color: white; padding: 10px; border-radius: 4px; font-size: 0.8rem; box-shadow: 0 0 20px #000;">
-    </div>
-
-    <script src="script.js"></script>
+    </div> <!-- KONIEC game-container -->
+<script src="script.js"></script>
 
     <!-- DEV TOOLS MODAL -->
     <div id="dev-tools-modal"

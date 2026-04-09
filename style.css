@@ -2080,3 +2080,88 @@ body {
     border-left: 4px solid #5a9cd2 !important;
     transform: translateY(-2px) scale(1.01) !important;
 }
+
+
+/* ========================================================
+   WITCHER TRAINING GROUND FIXES (USER REQUEST)
+   ======================================================== */
+.witcher-title {
+    color: var(--gold);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    border-bottom: 1px solid #333;
+    padding-bottom: 10px;
+    margin-bottom: 15px;
+}
+
+.witcher-btn {
+    background: #111;
+    color: #eee;
+    border: 1px solid #333;
+    padding: 12px 20px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+    border-radius: 4px;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+}
+
+.witcher-btn.action-btn {
+    border-left: 4px solid var(--gold);
+}
+
+.witcher-btn.cancel-btn {
+    border-left: 4px solid #555;
+}
+
+.witcher-btn:hover {
+    background: #1a1a1a;
+    border-color: var(--gold);
+}
+
+.full-width {
+    width: 100%;
+}
+
+/* agiSlider Styling */
+input[type=range]#agiSlider {
+    -webkit-appearance: none;
+    width: 100%;
+    background: transparent;
+}
+
+input[type=range]#agiSlider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    height: 16px;
+    width: 16px;
+    background: var(--gold);
+    cursor: pointer;
+    border-radius: 50%;
+    box-shadow: 0 0 10px rgba(218, 165, 32, 0.5);
+    margin-top: -6px; /* offset for track */
+}
+
+input[type=range]#agiSlider::-webkit-slider-runnable-track {
+    width: 100%;
+    height: 4px;
+    cursor: pointer;
+    background: #333;
+    border-radius: 2px;
+}
+
+/* Strict training-list & monster-card theming */
+#training-list .monster-card {
+    background: #1a1a1a !important;
+    border: 1px solid #333 !important;
+    border-left: 4px solid #4682b4 !important; /* Steel-blue */
+    color: #eee;
+}
+
+#training-list .monster-card:hover {
+    background: #252525 !important;
+    border-color: #5a9cd2 !important;
+    border-left: 4px solid #5a9cd2 !important;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(70, 130, 180, 0.2);
+}
